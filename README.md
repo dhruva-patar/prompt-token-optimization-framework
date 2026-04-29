@@ -1,7 +1,7 @@
 # LLM Prompt Compression & Optimization Framework (PTOF)
 > A deterministic prompt optimization algorithm for improving LLM input quality before inference.
 
-PTOF optimizes prompts for both token efficiency and response quality.
+PTOF optimizes prompts for both token efficiency and response quality — balancing compression with clarity.
 
 PTOF is a rule-based framework that standardizes, compresses, and structures prompts for Large Language Models.
 
