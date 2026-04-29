@@ -77,10 +77,8 @@ What is overfitting?
 **Input:**
 Compare Docker vs Kubernetes and recommend one
 
-
 **Output:**
 Docker vs Kubernetes — differences and recommendation?
-
 
 ---
 
@@ -91,7 +89,6 @@ Analyse user churn
 
 **Output:**
 CLARIFY: Please share the data, file, or metrics to analyse.
-
 
 ---
 
