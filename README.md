@@ -119,7 +119,7 @@ PTOF runs entirely inside your system prompt — no code or setup required.
 
 ### Step 1 — Setup
 
-1. Open: `pipeline/optimization_framework.md`
+1. Open: `pipeline/prompt_pipeline.md`
 2. Copy the content
 3. Paste it into your system prompt
 
