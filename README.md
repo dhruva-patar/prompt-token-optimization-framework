@@ -1,6 +1,7 @@
 # LLM Prompt Compression & Optimization Framework (PTOF)
-PTOF optimizes prompts for both token efficiency and response quality.
 > A deterministic prompt optimization algorithm for improving LLM input quality before inference.
+
+PTOF optimizes prompts for both token efficiency and response quality.
 
 PTOF is a rule-based framework that standardizes, compresses, and structures prompts for Large Language Models.
 
@@ -106,13 +107,13 @@ In some cases, prompts may remain the same length (or slightly longer) if it imp
 ---
 
 ## 📁 Project Structure
-pipeline/ # core optimization logic
-examples/ # real-world prompt transformations
-docs/ # system architecture
-ptof.py # CLI reference implementation
 
-
----
+```
+pipeline/    # core optimization logic
+examples/    # real-world prompt transformations
+docs/        # system architecture
+ptof.py      # CLI reference implementation
+```
 
 ## 💡 Use Cases
 
@@ -146,15 +147,15 @@ This approach treats prompt design as a systems problem rather than trial-and-er
 
 ### CLI
 
+```
 python ptof.py "How do I implement JWT authentication in Node.js?"
-
+```
 
 **Output:**
+```
 COMPRESSED PROMPT: Implement JWT authentication in Node.js — steps?
 TYPE: Technical
-
-
----
+```
 
 ## 📊 Examples
 
