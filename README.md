@@ -43,6 +43,16 @@ The pipeline runs in 5 steps:
 
 ---
 
+## 👤 Who is this for
+
+- Product teams building AI features
+- Developers working with LLM APIs
+- Prompt engineers optimizing outputs
+- Startups trying to reduce token costs
+- Anyone building chatbots or copilots
+
+---
+
 ## 🔍 Before vs After
 
 **Before (33 tokens):**
@@ -74,12 +84,51 @@ docs/ → system architecture
 
 ---
 
+## 📈 Impact
+
+- Up to ~50–60% token reduction
+- More structured LLM outputs
+- Reduced hallucination in analytical tasks
+- Faster response parsing for downstream systems
+
+---
+
 ## ⚡ Quick Start
+
+### Step 1 — Setup
 
 1. Open: `pipeline/optimization_framework.md`
 2. Copy the content
 3. Paste it into your system prompt
-4. Start sending user inputs
+
+---
+
+### Step 2 — Use it
+
+Send any normal prompt:
+
+```
+Can you please explain what overfitting is?
+```
+
+---
+
+### Step 3 — Output
+
+The pipeline transforms it into:
+
+```
+What is overfitting?
+```
+
+---
+
+### Result
+
+* Reduced tokens
+* Clearer intent
+* More structured LLM responses
+
 
 ---
 
