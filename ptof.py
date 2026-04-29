@@ -34,21 +34,44 @@ def classify_prompt(prompt: str) -> str:
 
 
 def compress_prompt(prompt: str) -> str:
-    compressed = prompt.strip()
+    text = prompt.lower().strip()
 
+    # remove filler phrases
     for phrase in FILLER_PHRASES:
-        compressed = compressed.replace(phrase, "")
-        compressed = compressed.replace(phrase.capitalize(), "")
+        text = text.replace(phrase, "")
 
-    compressed = " ".join(compressed.split())
+    text = " ".join(text.split())
 
-    if compressed and compressed[-1] not in ".?!":
-        compressed += "?"
+    # fix common patterns
+    if "what" in text and "is" in text:
+        # ensure "what is X" structure
+        parts = text.split("what")
+        if len(parts) > 1:
+            text = "what is " + parts[1].replace("is", "").strip()
 
-    compressed = compressed[0].upper() + compressed[1:] if compressed else prompt
+    # capitalize first letter
+    text = text.strip()
+    if text:
+        text = text[0].upper() + text[1:]
 
-    return compressed
+    # ensure question mark
+    if text and text[-1] not in "?":
+        text += "?"
 
+    return text
+
+def has_analysis_data(prompt: str) -> bool:
+    text = prompt.lower()
+
+    data_signals = [
+        "%", "accuracy", "f1", "precision", "recall",
+        "conversion", "retention", "drop-off", "dropoff",
+        "revenue", "cost", "latency", "ms", "nps",
+        "users", "sessions", "transactions", "metrics",
+        "csv", "file", "data", "results"
+    ]
+
+    return any(signal in text for signal in data_signals)
 
 def main():
     if len(sys.argv) < 2:
@@ -56,7 +79,28 @@ def main():
         return
 
     user_prompt = " ".join(sys.argv[1:])
+
+    word_count = len(user_prompt.split())
+
+    if word_count < 5:
+        clean_prompt = user_prompt.lower().capitalize()
+
+        # fix common acronyms
+        acronyms = ["ai", "api", "llm", "nlp"]
+        for a in acronyms:
+            clean_prompt = clean_prompt.replace(a, a.upper())
+
+        print(f"COMPRESSED PROMPT: {clean_prompt}")
+        print("TYPE: Informational")
+        print("NOTE: Short prompt — no optimization applied")
+        return 
+
     task_type = classify_prompt(user_prompt)
+
+    if task_type == "Analytical" and not has_analysis_data(user_prompt):
+        print("CLARIFY: Please share the data, file, or metrics to analyse.")
+        return
+
     compressed_prompt = compress_prompt(user_prompt)
 
     print(f"COMPRESSED PROMPT: {compressed_prompt}")
