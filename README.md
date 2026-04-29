@@ -1,10 +1,13 @@
-# LLM Prompt Compression Agent (PTOF)
+# LLM Prompt Compression & Optimization Agent (PTOF)
+> A lightweight LLM middleware for prompt standardization, compression, and structured reasoning.
 
 A deterministic prompt optimization framework that improves LLM response quality, reduces token usage, and enforces structured reasoning — without fine-tuning or additional infrastructure.
 
+Built as a deterministic alternative to heuristic-heavy prompt engineering approaches.
+
 ---
 
-## 🚀 What it does
+## 🚀 Core Capabilities
 
 PTOF acts as a preprocessing layer between user input and an LLM:
 
@@ -17,6 +20,8 @@ PTOF acts as a preprocessing layer between user input and an LLM:
 ---
 
 ## 🧠 Why this matters
+
+This is especially useful in production LLM systems where prompt quality directly impacts cost, latency, and reliability.
 
 Most LLM problems are not model problems — they are input problems.
 
@@ -68,11 +73,11 @@ Supervised vs unsupervised learning — key differences?
 
 ## 📁 Project Structure
 
-pipeline/ → core optimization logic
-examples/ → real-world prompt transformations
-docs/ → system architecture
-
----
+```
+pipeline/    # core optimization logic
+examples/    # real-world prompt transformations
+docs/        # system architecture
+```
 
 ## 💡 Use Cases
 
@@ -90,6 +95,23 @@ docs/ → system architecture
 - More structured LLM outputs
 - Reduced hallucination in analytical tasks
 - Faster response parsing for downstream systems
+- Lower token usage → reduced API cost in production systems
+
+---
+
+## 🧪 Key Insight
+
+PTOF demonstrates that significant gains in LLM performance can be achieved through input optimization alone — without modifying the model or increasing system complexity.
+
+Inspired by real-world limitations observed in production LLM systems.
+
+This approach treats prompt design as a systems problem rather than a trial-and-error process.
+
+---
+
+## ⚡ Zero Setup
+
+PTOF runs entirely inside your system prompt — no code or setup required.
 
 ---
 
@@ -142,6 +164,12 @@ See `/examples` folder for:
 * Creative prompts
 * Strategic prompts
 * Technical prompts
+
+---
+
+## 🧩 Design Philosophy
+
+PTOF prioritizes deterministic logic over model-dependent behavior — ensuring predictable outputs without relying on fine-tuning or prompt heuristics.
 
 ---
 
