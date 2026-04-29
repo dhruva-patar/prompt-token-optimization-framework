@@ -36,7 +36,7 @@ If you use this in research, please cite using the CITATION.cff file
 or the format below:
 
 [Dhruva Patar] (2026). Prompt Token Optimization Framework (PTOF). 
-GitHub. https://github.com/yourusername/prompt-token-optimization-framework
+GitHub. https://github.com/z3us666/prompt-token-optimization-framework
 
 ## Status
 
