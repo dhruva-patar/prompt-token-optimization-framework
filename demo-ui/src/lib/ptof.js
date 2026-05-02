@@ -54,18 +54,21 @@ export function optimizePrompt(text) {
 
   if (lower.includes("train")) transport.push("train outbound");
   if (lower.includes("flight") || lower.includes("plane")) transport.push("flight return");
+ 
+  if (transport.length) {
+     constraints.push(transport.join(", "));
+  }
 
-  if (transport.length) constraints.push(transport.join(", "));
   if (lower.includes("village")) constraints.push("one village stop en route");
   if (lower.includes("local transport") || lower.includes("within")) {
     constraints.push("local transport in Oslo/Gothenburg");
   }
   if (lower.includes("bergen")) {
-    constraints.push("compare Bergen under same constraints");
+    constraints.push("compare Bergen under the same constraints");
   }
 
   const compressedPrompt = constraints.length
-    ? `${context.join(" ")}: ${constraints.join(", ")}.`
+    ? `${context.join(" ")}. Explicit constraints: ${constraints.join(", ")}.`
     : `${context.join(" ")}.`;
 
   return {
