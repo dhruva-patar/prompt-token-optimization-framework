@@ -1,188 +1,179 @@
-# LLM Prompt Compression & Optimization Framework (PTOF)
-> A deterministic prompt optimization algorithm for improving LLM input quality before inference.
+# Prompt Token Optimization Framework (PTOF)
 
-PTOF optimizes prompts for both token efficiency and response quality — balancing compression with clarity.
+A deterministic preprocessing framework that optimizes prompts before sending them to an LLM.
 
-PTOF is a rule-based framework that standardizes, compresses, and structures prompts for Large Language Models.
-
-It acts as a preprocessing layer between user input and an LLM — improving clarity, preserving intent, and enforcing structured reasoning without fine-tuning or additional infrastructure.
-
-Built as a deterministic alternative to heuristic-heavy prompt engineering approaches.
+PTOF is not a prompt generator.  
+It is a prompt optimizer.
 
 ---
 
-## 🚀 Core Capabilities
+## 🚀 Why PTOF?
 
-PTOF transforms raw prompts into optimized inputs by:
+Most LLM issues are not model problems — they are input problems.
 
-- Classifying prompt intent  
-- Removing filler and noise  
-- Preserving logic and constraints  
-- Applying structured transformations  
-- Enforcing analytical guardrails  
-- Producing clearer, more consistent prompts  
+PTOF improves:
 
----
+- clarity
+- structure
+- token efficiency
+- predictability
 
-## 🧠 Why this matters
-
-Most LLM problems are not model problems — they are input problems.
-
-Poor prompts lead to:
-
-- ❌ Unclear or inconsistent responses  
-- ❌ Unnecessary token usage  
-- ❌ Hallucinated outputs in analytical tasks  
-
-PTOF improves this by optimizing prompts **before they reach the model**.
+before inference happens.
 
 ---
 
-## ⚙️ How it works
+## 🧠 Core Idea
 
-The pipeline runs in 5 steps:
+PTOF acts as a **preprocessing layer** between user input and an LLM.
 
-1. Token Threshold Check  
-2. Intent Classification  
-3. Filler Stripping  
-4. Logic Preservation  
-5. Adaptive Structuring  
+```text
+Raw Prompt → PTOF → Optimized Prompt → LLM
+```
 
-👉 Full breakdown: `docs/architecture.md`
+It ensures:
 
----
-
-## 👤 Who is this for
-
-- Product teams building AI features  
-- Developers working with LLM APIs  
-- Prompt engineers optimizing outputs  
-- Startups trying to reduce token costs  
-- Anyone building chatbots or copilots  
+```text
+clean input → controlled output → better results
+```
 
 ---
 
-## 🔍 Examples
+## ⚙️ How It Works
 
-### Example 1 — Compression + clarity
+PTOF follows a deterministic pipeline:
 
-**Input:**
-I was wondering if you could please help me understand what overfitting actually means
+```text
+Pre-check → Classify → Analytical Check → Strip → Logic Gate → Format → Output
+```
 
-**Output:**
-What is overfitting?
+### Key Steps
 
----
+- **Pre-check**  
+  Skips heavy processing for short prompts (<15 tokens)
 
-### Example 2 — Structure over compression
+- **Classification**  
+  Assigns a single task type (Informational, Decision, etc.)
 
-**Input:**
-Compare Docker vs Kubernetes and recommend one
+- **Analytical Check**  
+  Stops execution if required data is missing
 
-**Output:**
-Docker vs Kubernetes — differences and recommendation?
+- **Strip**  
+  Removes conversational filler
 
----
+- **Logic Gate**  
+  Preserves conditionals, trade-offs, and structure
 
-### Example 3 — Analytical guardrail
-
-**Input:**
-Analyse user churn
-
-**Output:**
-CLARIFY: Please share the data, file, or metrics to analyse.
+- **Adaptive Format**  
+  Adds strict output constraints
 
 ---
 
-## ⚖️ Token vs Quality
+## 📦 Output Example
 
-PTOF does **not always reduce tokens**.
+**Input**
+```text
+Can you please explain what prompt engineering is?
+```
 
-It follows this principle:
+**Output**
+```text
+Explain what prompt engineering is. Use max 7 bullets.
+```
 
-> Reduce tokens when safe. Improve clarity when needed.
+**Type**
+```text
+Informational
+```
 
-In some cases, prompts may remain the same length (or slightly longer) if it improves structure and response quality.
+---
+
+## 🛠️ CLI Usage
+
+Run directly from terminal:
+
+```bash
+node cli/ptof-cli.js "Explain OAuth"
+```
+
+Example output:
+
+```text
+COMPRESSED PROMPT:
+Explain OAuth. Use max 7 bullets.
+
+TYPE:
+Informational
+```
 
 ---
 
 ## 📁 Project Structure
 
-```
-pipeline/    # core optimization logic
-examples/    # real-world prompt transformations
-docs/        # system architecture
-ptof.py      # CLI reference implementation
-```
+```text
+core/
+  optimizer.js        # deterministic engine
 
-## 💡 Use Cases
+cli/
+  ptof-cli.js         # CLI interface
 
-- AI product input standardization  
-- Prompt cost optimization  
-- Chatbot consistency improvements  
-- LLM middleware systems  
-- Prompt engineering workflows  
+pipeline/
+  prompt-pipeline.md  # source-of-truth spec
+
+docs/
+  architecture.md
+  pipeline-explained.md
+
+demo-ui/
+  src/lib/ptof.js     # legacy prototype
+```
 
 ---
 
-## 📈 Impact
+## 🧭 Design Principles
 
-- Up to ~50–60% token reduction (filler-heavy prompts)  
-- More structured LLM outputs  
-- Reduced hallucination in analytical tasks  
-- Faster response parsing  
-- Lower API cost in production systems  
+PTOF prioritizes:
 
----
+- deterministic behavior
+- token efficiency
+- meaning preservation
+- bounded outputs
+- explainability
 
-## 🧪 Key Insight
+PTOF avoids:
 
-PTOF demonstrates that significant gains in LLM performance can be achieved through input optimization alone — without modifying the model.
-
-This approach treats prompt design as a systems problem rather than trial-and-error.
-
----
-
-## ⚡ Quick Start
-
-### CLI
-
-```
-python ptof.py "How do I implement JWT authentication in Node.js?"
-```
-
-**Output:**
-```
-COMPRESSED PROMPT: Implement JWT authentication in Node.js — steps?
-TYPE: Technical
-```
-
-## 📊 Examples
-
-See `/examples` folder for:
-
-- Analytical prompts  
-- Comparative prompts  
-- Decision-making prompts  
-- Creative prompts  
-- Strategic prompts  
-- Technical prompts  
-
----
-
-## 🧩 Design Philosophy
-
-PTOF prioritizes deterministic logic over model-dependent behavior — ensuring predictable outputs without relying on fine-tuning or prompt heuristics.
+- semantic guessing
+- over-engineering
+- unnecessary rewriting
 
 ---
 
 ## 📌 Status
 
-v0.1.0 — Initial release  
-Evaluation in progress  
+Current version:
+
+- Core pipeline implemented
+- CLI working
+- Documentation aligned
+- UI integration pending
 
 ---
 
-## 📜 License
+## 🔮 Roadmap
+
+- Full alignment with pipeline spec
+- UI integration with core engine
+- Test harness for all prompt types
+- Complex prompt handling improvements
+- Output optimization layer
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome once the core framework stabilizes.
+
+---
+
+## 📄 License
 
 MIT
