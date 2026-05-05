@@ -6,13 +6,35 @@ export function estimateTokens(text) {
 export function classifyTask(text) {
   const lower = (text || "").toLowerCase();
 
-  if (lower.includes("compare")) return "Comparative";
-  if (lower.includes("analyze")) return "Analytical";
-  if (lower.includes("decide") || lower.includes("choose")) return "Decision";
-  if (lower.includes("strategy") || lower.includes("plan")) return "Strategic";
-  if (lower.includes("code") || lower.includes("debug")) return "Technical";
-  if (lower.includes("write") || lower.includes("create")) return "Creative";
-  if (lower.includes("plan")) return "Planning";
+  // High intent (core task types first)
+  if (/\b(build|implement|debug|code|develop)\b/.test(lower)) {
+    return "Technical";
+  }
+
+  if (/\b(analyze|analysis|evaluate|investigate)\b/.test(lower)) {
+    return "Analytical";
+  }
+
+  if (/\b(decide|choose|select|which)\b/.test(lower)) {
+    return "Decision";
+  }
+
+  if (/\b(design|strategy|roadmap|go-to-market)\b/.test(lower)) {
+    return "Strategic";
+  }
+
+  if (/\b(plan|planning|itinerary)\b/.test(lower)) {
+    return "Planning";
+  }
+
+  if (/\b(write|create|copy|story|content)\b/.test(lower)) {
+    return "Creative";
+  }
+
+  // Secondary modifiers (lower priority)
+  if (/\b(compare|vs|versus)\b/.test(lower)) {
+    return "Comparative";
+  }
 
   return "Informational";
 }
@@ -26,12 +48,43 @@ function cleanPrompt(text) {
 
 function compressPrimary(primary) {
   return primary
-    .replace(/\b(help me|suggest|i want to|explain how to)\b/gi, "")
-    //.replace(/\b(a|the)\b/gi, "")
+    .replace(/\b(help me|please|can you|could you|i want to|i need to)\b/gi, "")
+    .replace(/\b(suggest|provide|explain how)\b/gi, "")
     .replace(/\b(step-by-step|structured|best way to)\b/gi, "")
+    .replace(/\s+from the last\s+\d+\s+years/gi, "")
+    .replace(/\s+focusing on\s+.+$/gi, "")
+    .replace(/\s+targeting\s+.+$/gi, "")
+    .replace(/\s+using\s+.+$/gi, "")
+    .replace(/\s+including\s+.+$/gi, "")
     .replace(/\b(that|which|who)\b.*$/i, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function extractCoreIntent(text) {
+  const cleaned = cleanPrompt(text);
+
+  const match = cleaned.match(
+    /\b(analyze|decide|design|build|write|plan|explain|create)\b\s+(.+?)(?=,|\.| and | including | based on | focusing on | targeting | using | with | without | compare |$)/i
+  );
+
+  if (!match) {
+    return compressPrimary(cleaned);
+  }
+
+  const action = capitalize(match[1]);
+  //const object = match[2].trim();
+  const object = match[2]
+    .replace(/\s+from the last\s+\d+\s+years/gi, "")
+    .replace(/\s+from\s+.+?\s+to\s+.+?(?=\s|$)/gi, "")
+    //.replace(/\s+focusing on\s+.+$/gi, "")
+    .replace(/\s+targeting\s+.+$/gi, "")
+    .replace(/\s+using\s+.+$/gi, "")
+    .replace(/\s+including\s+.+$/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return `${action} ${object}`;
 }
 
 function extractPrimaryClause(text) {
@@ -84,10 +137,9 @@ function extractSecondarySignals(text) {
 }
 
 function capitalize(value) {
-  return value
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
+  if (!value) return "";
+
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function extractAction(text) {
@@ -124,6 +176,12 @@ function compressConstraint(value) {
     .replace(/\b(using)\b/gi, "using:")
     .replace(/\b(without)\b/gi, "avoid:")
     .replace(/\b(with)\b/gi, "with:")
+    .replace(/\bfrom the last\b/gi, "period:")
+    .replace(/\b(including)\b/gi, "include:")
+    .replace(/\b(based on)\b/gi, "basis:")
+    //.replace(/\b(reduces?|improves?)\b/gi, "goal:")
+    .replace(/\breduces?\b/gi, "goal: reduce")
+    .replace(/\bimproves?\b/gi, "goal: improve") 
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -133,11 +191,15 @@ function extractConstraints(text) {
   const constraints = [];
 
   const phrasePatterns = [
-    /\bwith\s+(.+?)(?=\.|,|$)/gi,
+    ///(?<!compare\s)\bwith\s+(.+?)(?=\.|,|$)/gi,
     /\bwithout\s+(.+?)(?=\.|,|$)/gi,
     /\busing\s+(.+?)(?=\.|,|$)/gi,
     /\bfocusing on\s+(.+?)(?=\.|,|$)/gi,
     /\btargeting\s+(.+?)(?=\.|,|$)/gi,
+    /\bfrom the last\s+(.+?)(?=\.|,|$)/gi,
+    /\bincluding\s+(.+?)(?=\.|$)/gi,
+    /\bbased on\s+(.+?)(?=\.|,|$)/gi,
+    /\breduces?\s+(.+?)(?=\.|,|$)/gi,
   ];
 
   phrasePatterns.forEach((pattern) => {
@@ -216,17 +278,31 @@ export function optimizePrompt(text) {
   const cleaned = cleanPrompt(text);
 
   const primary = extractPrimaryClause(text);
+  const coreIntent = extractCoreIntent(text);
   //const action = extractAction(cleaned);
   const entity = extractEntities(text);
   const contextInfo = extractContext(text);
   const constraints = extractConstraints(text);
-  const extensions = extractExtensions(text);
+  const rawExtensions = extractExtensions(text);
+  //const extensions = extractExtensions(text);
   //const secondary = extractSecondarySignals(text);
 
 
   const parts = [];
 
-  const primaryText = capitalize(compressPrimary(primary));
+  const primaryText = capitalize(coreIntent);
+  //const primaryText = capitalize(compressPrimary(primary));
+
+  const extensions = rawExtensions.filter((extension) => {
+    const normalizedPrimary = primaryText.toLowerCase();
+    const normalizedExtension = extension.toLowerCase();
+
+    return (
+      !normalizedPrimary.includes(normalizedExtension) &&
+      !normalizedExtension.includes(normalizedPrimary)
+    );
+  });
+
   /*const fallbackContext = primary
     .replace(/\b(help me|suggest|i want to|explain how to)\b/gi, "")
     .replace(/\b(step-by-step|structured|best way to)\b/gi, "")
@@ -263,7 +339,7 @@ export function optimizePrompt(text) {
   const base = parts.join(" ");
 
   const constraintText = constraints.length
-    ? `Explicit constraints: ${constraints.join(", ")}`
+    ? constraints.join(", ")
     : "";
   
   const extensionText = extensions.length
