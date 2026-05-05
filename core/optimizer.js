@@ -57,7 +57,8 @@ export function optimizePrompt(userPrompt) {
   const tokenCount = estimateTokens(userPrompt);
   const shortPrompt = tokenCount < 15;
 
-  let type = shortPrompt ? "Informational" : classifyPrompt(userPrompt);
+  //let type = shortPrompt ? "Informational" : classifyPrompt(userPrompt);
+  let type = classifyPrompt(userPrompt);  
 
   if (type === "Analytical" && !hasAnalyticalData(userPrompt)) {
     return {
@@ -75,7 +76,10 @@ export function optimizePrompt(userPrompt) {
   const complex = shortPrompt ? false : detectComplexity(stripped);
   const formatRule = getDefaultFormat(type);
 
-  const compressedPrompt = `${stripped}. ${formatRule}`;
+  //const compressedPrompt = `${stripped}. ${formatRule}`;
+
+  const cleanStripped = stripped.replace(/[?.!]+$/, "");
+  const compressedPrompt = `${cleanStripped}. ${formatRule}`;
 
   return {
     compressedPrompt,
