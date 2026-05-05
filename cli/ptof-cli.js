@@ -14,13 +14,19 @@ if (result.clarify) {
   process.exit(0);
 }
 
+if (result.shortPrompt) {
+  console.log("");
+  console.log("NOTE:");
+  console.log("Short prompt — Steps 2–3 bypassed");
+}
+
 console.log("COMPRESSED PROMPT:");
 console.log(result.compressedPrompt);
 console.log("");
 console.log("TYPE:");
 console.log(`${result.type}${result.complex ? " complex" : ""}`);
 
-if (result.notes.length) {
+if (result.notes && result.notes.length) {
   console.log("");
   console.log("NOTE:");
   result.notes.forEach((note) => console.log(note));

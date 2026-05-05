@@ -1,9 +1,9 @@
 cff-version: 1.2.0
 message: "If you use this framework, please cite it as below."
-title: "Prompt Preprocessing Pipeline (PPPL)"
+title: "Prompt Token Optimization Framework (PTOF)"
 authors:
   - family-names: "Patar"
     given-names: "Dhruva"
 version: 0.1.0
 date-released: 2026-04-29
-url: "https://github.com/yourusername/prompt-preprocessing-pipeline"
+url: "https://github.com/dhruva-patar/prompt-token-optimization-framework"
