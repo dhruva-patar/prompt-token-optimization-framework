@@ -1,52 +1,83 @@
 import { useState } from "react";
-import { optimizePrompt, estimateTokens } from "./lib/ptof.js";
+import { optimizePrompt, estimateTokens } from "../../core/optimizer.js";
+import "./App.css";
 
 export default function App() {
   const [rawPrompt, setRawPrompt] = useState("");
 
   const result = optimizePrompt(rawPrompt);
-  const before = estimateTokens(rawPrompt);
-  const after = estimateTokens(result.compressedPrompt);
-  const reduction = before ? Math.round(((before - after) / before) * 100) : 0;
-  const savedTokens = before - after;
+
+  const beforeTokens = estimateTokens(rawPrompt);
+  const afterTokens = estimateTokens(result.compressedPrompt || "");
+  const tokenDelta = beforeTokens - afterTokens;
 
   return (
-    <div style={{ padding: "40px", fontFamily: "Arial", maxWidth: "1000px", margin: "0 auto" }}>
-      <h1>PTOF Prompt Compression Agent</h1>
+    <main className="app">
+      <section className="hero">
+        <h1>PTOF Prompt Optimization Agent</h1>
+        <p>
+          Deterministic prompt preprocessing for clearer, safer, and more
+          structured LLM inputs.
+        </p>
+        <p className="mode">
+          <strong>Mode:</strong> Safe — preserves semantic intent over aggressive
+          token reduction.
+        </p>
+      </section>
 
-      <label><strong>Raw Prompt</strong></label>
-      <textarea
-        placeholder="Paste raw prompt..."
-        value={rawPrompt}
-        onChange={(e) => setRawPrompt(e.target.value)}
-        rows={8}
-        style={{ width: "100%", marginTop: "8px", marginBottom: "24px", padding: "12px" }}
-      />
+      <section className="grid">
+        <div className="card">
+          <h2>Raw Prompt</h2>
+          <textarea
+            value={rawPrompt}
+            onChange={(e) => setRawPrompt(e.target.value)}
+            placeholder="Enter your prompt..."
+          />
+          <p className="meta">Estimated tokens: {beforeTokens}</p>
+        </div>
 
-      <label><strong>Optimized Prompt</strong></label>
-      <textarea
-        value={result.compressedPrompt}
-        readOnly
-        rows={14}
-        style={{ width: "100%", marginTop: "8px", padding: "12px" }}
-      />
+        <div className="card">
+          <h2>Optimized Prompt</h2>
+          <textarea
+            readOnly
+            value={result.clarify || result.compressedPrompt}
+            placeholder="Optimized prompt will appear here..."
+          />
 
-      <p><strong>Task type:</strong> {result.taskType}</p>
-      <div style={{ marginTop: "24px", padding: "16px", border: "1px solid #ddd", borderRadius: "8px" }}>
-        <h3>Token Awareness</h3>
+          <div className="details">
+            {result.formatRule && (
+              <p>
+                <strong>Format Rule:</strong> {result.formatRule}
+              </p>
+            )}
 
-        <p><strong>Before:</strong> {before} tokens</p>
-        <p><strong>After:</strong> {after} tokens</p>
-        <p><strong>Saved:</strong> {savedTokens} tokens</p>
-        <p><strong>Reduction:</strong> {reduction}%</p>
-      </div>
+            <p>
+              <strong>Type:</strong> {result.type}
+            </p>
 
-      <h3>Notes</h3>
-      <ul>
-        {result.notes.map((note, index) => (
-          <li key={index}>{note}</li>
-        ))}
-      </ul>
-    </div>
+            <p>
+              <strong>Complex:</strong> {result.complex ? "Yes" : "No"}
+            </p>
+
+            {result.clarify && (
+              <p>
+                <strong>Clarify:</strong> {result.clarify}
+              </p>
+            )}
+
+            {result.notes?.length > 0 && (
+              <p>
+                <strong>Notes:</strong> {result.notes.join(", ")}
+              </p>
+            )}
+
+            <p>
+              <strong>Token Estimate:</strong> {beforeTokens} → {afterTokens}
+              {rawPrompt && ` (${tokenDelta >= 0 ? "-" : "+"}${Math.abs(tokenDelta)} tokens)`}
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
