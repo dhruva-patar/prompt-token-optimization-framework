@@ -10,18 +10,41 @@ function stripFiller(text) {
     .trim();
 }
 
-function classifyPrompt(text) {
-  const lower = text.toLowerCase();
+function detectTypeSignals(text) {
+  const lower = (text || "").toLowerCase();
 
-  if (/\b(analyze|analyse|evaluate|assess)\b/.test(lower)) return "Analytical";
-  if (/\b(best|recommend|should i|decide|choose)\b/.test(lower)) return "Decision";
-  if (/\b(compare|vs|difference)\b/.test(lower)) return "Comparative";
-  if (/\b(write|create|generate)\b/.test(lower)) return "Creative";
-  if (/\b(plan|strategy|roadmap)\b/.test(lower)) return "Strategic";
-  if (/\b(how to|steps|implement|build|debug|code)\b/.test(lower)) return "Technical";
-  if (/\b(explain|what is|why)\b/.test(lower)) return "Informational";
+  const signals = [];
 
-  return "Informational";
+  const patterns = [
+    ["Informational", /\b(explain|what is|why)\b/],
+    ["Decision", /\b(best|recommend|should i|decide|choose|suggest one|which)\b/],
+    ["Comparative", /\b(compare|vs|versus|difference)\b/],
+    ["Creative", /\b(write|create|generate)\b/],
+    ["Strategic", /\b(plan|strategy|roadmap|go-to-market|gtm)\b/],
+    ["Technical", /\b(how to|steps|implement|build|debug|code)\b/],
+    ["Analytical", /\b(analyze|analyse|evaluate|assess)\b/],
+  ];
+
+  patterns.forEach(([type, pattern]) => {
+    const match = lower.match(pattern);
+
+    if (match) {
+      signals.push({
+        type,
+        index: match.index,
+      });
+    }
+  });
+
+  return signals.sort((a, b) => a.index - b.index);
+}
+
+export function classifyPrompt(text) {
+  const signals = detectTypeSignals(text);
+
+  if (!signals.length) return "Informational";
+
+  return signals[0].type;
 }
 
 function getDefaultFormat(type) {
@@ -57,14 +80,20 @@ export function optimizePrompt(userPrompt) {
   const tokenCount = estimateTokens(userPrompt);
   const shortPrompt = tokenCount < 15;
 
-  //let type = shortPrompt ? "Informational" : classifyPrompt(userPrompt);
-  let type = classifyPrompt(userPrompt);  
+  let type = classifyPrompt(userPrompt); 
+  
+  const stripped = shortPrompt ? userPrompt.trim() : stripFiller(userPrompt);
+  
+  const typeSignals = detectTypeSignals(userPrompt);
+  const uniqueTypes = [...new Set(typeSignals.map((signal) => signal.type))];
+  
+  const complex = uniqueTypes.length > 1 || detectComplexity(stripped);
 
   if (type === "Analytical" && !hasAnalyticalData(userPrompt)) {
     return {
       compressedPrompt: "",
       type,
-      complex: false,
+      complex,
       notes: [],
       clarify: "Please share the data, file, or metrics to analyse.",
       shortPrompt,
@@ -72,12 +101,9 @@ export function optimizePrompt(userPrompt) {
     };
   }
 
-  const stripped = shortPrompt ? userPrompt.trim() : stripFiller(userPrompt);
-  const complex = shortPrompt ? false : detectComplexity(stripped);
+  
+  
   const formatRule = getDefaultFormat(type);
-
-  //const compressedPrompt = `${stripped}. ${formatRule}`;
-
   const cleanStripped = stripped.replace(/[?.!]+$/, "");
   const compressedPrompt = `${cleanStripped}. ${formatRule}`;
 
@@ -92,4 +118,4 @@ export function optimizePrompt(userPrompt) {
   };
 }
 
-export { estimateTokens, classifyPrompt };
+export { estimateTokens};
