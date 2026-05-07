@@ -62,7 +62,19 @@ function getDefaultFormat(type) {
 }
 
 function hasAnalyticalData(text) {
-  return /\b(data|dataset|file|metrics|numbers|csv|spreadsheet|report|table)\b/i.test(text);
+  const lower = text.toLowerCase();
+
+  const explicitDataSignals =
+    /\b(data|dataset|file|metrics|numbers|csv|spreadsheet|table)\b/i.test(lower);
+
+  const marketResearchSignals =
+    /\b(trends|industry|market|country|sector|growth|consumer|startup|economy)\b/i.test(lower);
+
+  if (marketResearchSignals) {
+    return true;
+  }
+
+  return explicitDataSignals;
 }
 
 function detectComplexity(text) {
@@ -76,7 +88,30 @@ function detectComplexity(text) {
   return signals.filter((pattern) => pattern.test(text)).length >= 2;
 }
 
+function compressBasic(text) {
+  return text
+    .replace(/\bwhat is\b/gi, "Explain")
+    .replace(/\bcompare it with\b/gi, "vs")
+    .replace(/\bsuggest one for\b/gi, "Recommend one for")
+    .replace(/\ba customer support chat function\b/gi, "customer support chat")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function optimizePrompt(userPrompt) {
+  if (!userPrompt || !userPrompt.trim()) {
+    return {
+      compressedPrompt: "",
+      formatRule: "",
+      type: "Waiting",
+      complex: false,
+      notes: ["Enter a prompt"],
+      clarify: "",
+      shortPrompt: false,
+      tokenCount: 0,
+    };
+  }
+
   const tokenCount = estimateTokens(userPrompt);
   const shortPrompt = tokenCount < 15;
 
@@ -101,11 +136,12 @@ export function optimizePrompt(userPrompt) {
     };
   }
 
-  
-  
   const formatRule = getDefaultFormat(type);
+
   const cleanStripped = stripped.replace(/[?.!]+$/, "");
-  const compressedPrompt = `${cleanStripped}. ${formatRule}`;
+  const compressedCore = compressBasic(cleanStripped);
+  const compressedPrompt = `${compressedCore}.`; 
+  
 
   return {
     compressedPrompt,
@@ -115,6 +151,7 @@ export function optimizePrompt(userPrompt) {
     clarify: "",
     shortPrompt,
     tokenCount,
+    formatRule,
   };
 }
 
