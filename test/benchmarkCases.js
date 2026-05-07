@@ -23,7 +23,7 @@ const benchmarkCases = [
     expected: {
       type: "Technical",
       complex: false,
-      shouldClarify: true,
+      shouldClarify: false,
       complexityLevel: "single-type",
       criticalTerms: ["React", "layout", "mobile"],
       requiredIntents: ["debug"],

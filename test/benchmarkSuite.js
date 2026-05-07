@@ -1,4 +1,12 @@
+const evaluateTypeAccuracy = require("./evaluators/typeAccuracy");
+
 const benchmarkCases = require("./benchmarkCases");
+
+const noisyPrompts = require("./benchmarkCases/noisyPrompts");
+const allBenchmarks = [
+  ...benchmarkCases,
+  ...noisyPrompts
+];
 
 const fs = require("fs");
 const path = require("path");
@@ -55,6 +63,7 @@ function getOverallStatus(evaluations) {
     evaluations.tokenEfficiency.status,
     evaluations.complexityAccuracy.status,
     evaluations.clarifyAccuracy.status,
+    evaluations.typeAccuracy.status,
   ];
 
   if (evaluations.semanticRisk.risk === "HIGH") return "FAIL";
@@ -90,6 +99,7 @@ function printCaseReport(testCase, result, evaluations, overallStatus) {
   console.log(`Clarification Logic: ${evaluations.clarifyAccuracy.status}`);
   console.log("");
   console.log(`Result: ${overallStatus}`);
+  console.log(`Type Accuracy: ${evaluations.typeAccuracy.status}`);
 }
 
 function runBenchmarkSuite() {
@@ -99,7 +109,7 @@ function runBenchmarkSuite() {
 
   const results = [];
 
-  benchmarkCases.forEach((testCase) => {
+  allBenchmarks.forEach((testCase) => {
     let rawResult;
 
     try {
@@ -119,6 +129,7 @@ function runBenchmarkSuite() {
       tokenEfficiency: evaluateTokenEfficiency(result.original, result.optimized),
       complexityAccuracy: evaluateComplexityAccuracy(result, testCase.expected),
       clarifyAccuracy: evaluateClarifyAccuracy(result, testCase.expected),
+      typeAccuracy: evaluateTypeAccuracy(result, testCase.expected),
     };
 
     const overallStatus = getOverallStatus(evaluations);
@@ -133,6 +144,7 @@ function runBenchmarkSuite() {
     instructionRetention: evaluations.instructionRetention.status,
     complexityAccuracy: evaluations.complexityAccuracy.status,
     clarifyAccuracy: evaluations.clarifyAccuracy.status,
+    
   });
 
     if (overallStatus === "PASS") pass += 1;

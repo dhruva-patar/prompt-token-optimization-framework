@@ -42,11 +42,59 @@ function detectTypeSignals(text) {
 }
 
 export function classifyPrompt(text) {
-  const signals = detectTypeSignals(text);
+  const lower = (text || "").toLowerCase();
 
-  if (!signals.length) return "Informational";
+  const startsWithCompare = /^\s*(compare|vs|versus)\b/i.test(lower);
+  const startsWithDecision = /^\s*(should i|decide|choose|recommend)\b/i.test(lower);
+  const startsWithCreate = /^\s*(create|write|generate)\b/i.test(lower);
+  const startsWithAnalyze = /^\s*(analyze|analyse|evaluate|assess)\b/i.test(lower);
+  const startsWithDebug = /^\s*(debug|fix|troubleshoot)\b/i.test(lower);
 
-  return signals[0].type;
+  if (startsWithCompare) return "Comparative";
+  if (startsWithDecision) return "Decision";
+  if (startsWithCreate) return "Creative";
+  if (startsWithAnalyze) return "Analytical";
+  if (startsWithDebug) return "Technical";
+
+  const hasDebugContext =
+    /\b(debug|fix|troubleshoot|broken|issue|problem)\b/i.test(lower) &&
+    /\b(react|code|component|layout|css|mobile|tablet)\b/i.test(lower);
+
+  if (hasDebugContext) return "Technical";
+
+  const scores = {
+    Informational: 0,
+    Decision: 0,
+    Comparative: 0,
+    Creative: 0,
+    Strategic: 0,
+    Technical: 0,
+    Analytical: 0,
+  };
+
+  const scoringRules = [
+    ["Informational", /\b(explain|what is|why)\b/g, 1],
+    ["Decision", /\b(best|recommend|should i|decide|choose|suggest one|which)\b/g, 2],
+    ["Comparative", /\b(compare|vs|versus|difference|trade-offs?)\b/g, 2],
+    ["Creative", /\b(write|create|generate)\b/g, 2],
+    ["Strategic", /\b(plan|strategy|roadmap|go-to-market|gtm)\b/g, 2],
+    //["Technical", /\b(how to|steps|implement|build|debug|code|react|layout|css|mobile|tablet)\b/g, 2],
+    ["Technical", /\b(how to|implement|build|debug|code|react|css)\b/g, 2],
+    ["Analytical", /\b(analyze|analyse|evaluate|assess|metrics|data)\b/g, 2],
+  ];
+
+  scoringRules.forEach(([type, pattern, weight]) => {
+    const matches = lower.match(pattern);
+    if (matches) {
+      scores[type] += matches.length * weight;
+    }
+  });
+
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  if (ranked[0][1] === 0) return "Informational";
+
+  return ranked[0][0];
 }
 
 function getDefaultFormat(type) {
@@ -80,11 +128,50 @@ function needsClarification(text, type) {
     return true;
   }
 
-  if (type === "Technical" && /\b(this|component|code)\b/i.test(lower)) {
+  if (
+    type === "Technical" &&
+    /\b(this|uploaded|attached)\b/i.test(lower) &&
+    /\b(component|code|file)\b/i.test(lower)
+  ) {
     return true;
   }
 
   return false;
+}
+
+function hasConstraintTension(text) {
+  const lower = text.toLowerCase();
+
+  const expansiveConstraints = [
+    "detailed",
+    "comprehensive",
+    "complete",
+    "all",
+    "full",
+    "thorough",
+    "in-depth"
+  ];
+
+  const restrictiveConstraints = [
+    "short",
+    "brief",
+    "concise",
+    "under",
+    "max",
+    "maximum",
+    "only",
+    "limited"
+  ];
+
+  const hasExpansive = expansiveConstraints.some((word) =>
+    lower.includes(word)
+  );
+
+  const hasRestrictive = restrictiveConstraints.some((word) =>
+    lower.includes(word)
+  );
+
+  return hasExpansive && hasRestrictive;
 }
 
 function detectComplexity(text) {
@@ -95,7 +182,12 @@ function detectComplexity(text) {
     /\bbut|however|whereas\b/i,
   ];
 
-  return signals.filter((pattern) => pattern.test(text)).length >= 2;
+  const patternComplexity =
+    signals.filter((pattern) => pattern.test(text)).length >= 2;
+
+  const constraintTension = hasConstraintTension(text);
+
+  return patternComplexity || constraintTension;
 }
 
 function compressBasic(text) {
