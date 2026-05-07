@@ -1,3 +1,5 @@
+import { runCompressionPipeline } from "./compression/compressionPipeline.js";
+
 function estimateTokens(text) {
   if (!text || !text.trim()) return 0;
   return Math.ceil(text.trim().split(/\s+/).length * 1.3);
@@ -147,7 +149,11 @@ export function optimizePrompt(userPrompt) {
   const formatRule = getDefaultFormat(type);
 
   const cleanStripped = stripped.replace(/[?.!]+$/, "");
-  const compressedCore = compressBasic(cleanStripped);
+  //const compressedCore = compressBasic(cleanStripped);
+  
+  const pipelineResult = runCompressionPipeline(compressBasic(cleanStripped));
+  const compressedCore = pipelineResult.compressedText;
+  
   const compressedPrompt = `${compressedCore}.`; 
   
 
@@ -155,7 +161,10 @@ export function optimizePrompt(userPrompt) {
     compressedPrompt,
     type,
     complex,
-    notes: shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : [],
+    notes: [
+      ...(shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : []),
+      ...pipelineResult.compressionNotes,
+    ],
     clarify: "",
     shortPrompt,
     tokenCount,

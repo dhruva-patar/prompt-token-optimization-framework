@@ -1,5 +1,8 @@
 const benchmarkCases = require("./benchmarkCases");
 
+const fs = require("fs");
+const path = require("path");
+
 const evaluateInstructionRetention = require("./evaluators/instructionRetention");
 const evaluateSemanticRisk = require("./evaluators/semanticRisk");
 const evaluateTokenEfficiency = require("./evaluators/tokenEfficiency");
@@ -94,6 +97,8 @@ function runBenchmarkSuite() {
   let warn = 0;
   let fail = 0;
 
+  const results = [];
+
   benchmarkCases.forEach((testCase) => {
     let rawResult;
 
@@ -118,6 +123,18 @@ function runBenchmarkSuite() {
 
     const overallStatus = getOverallStatus(evaluations);
 
+    results.push({
+    case: testCase.name,
+    expectedType: testCase.expected.type,
+    actualType: result.type,
+    status: overallStatus,
+    semanticRisk: evaluations.semanticRisk.risk,
+    tokenReduction: evaluations.tokenEfficiency.reductionPercent,
+    instructionRetention: evaluations.instructionRetention.status,
+    complexityAccuracy: evaluations.complexityAccuracy.status,
+    clarifyAccuracy: evaluations.clarifyAccuracy.status,
+  });
+
     if (overallStatus === "PASS") pass += 1;
     if (overallStatus === "WARN") warn += 1;
     if (overallStatus === "FAIL") fail += 1;
@@ -131,6 +148,30 @@ function runBenchmarkSuite() {
   console.log(`PASS: ${pass}`);
   console.log(`WARN: ${warn}`);
   console.log(`FAIL: ${fail}`);
+
+  const resultsDir = path.join(__dirname, "results");
+
+if (!fs.existsSync(resultsDir)) {
+  fs.mkdirSync(resultsDir, { recursive: true });
+}
+
+const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+const resultsPath = path.join(resultsDir, `benchmark-${timestamp}.json`);
+
+fs.writeFileSync(
+  resultsPath,
+  JSON.stringify(
+    {
+      generatedAt: new Date().toISOString(),
+      summary: { pass, warn, fail },
+      cases: results,
+    },
+    null,
+    2
+  )
+);
+
+console.log(`\nSaved benchmark results: ${resultsPath}`);
 
   if (fail > 0) {
     process.exitCode = 1;
