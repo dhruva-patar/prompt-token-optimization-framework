@@ -61,20 +61,28 @@ function getDefaultFormat(type) {
   return formats[type] || formats.Informational;
 }
 
-function hasAnalyticalData(text) {
+function needsClarification(text, type) {
   const lower = text.toLowerCase();
 
-  const explicitDataSignals =
-    /\b(data|dataset|file|metrics|numbers|csv|spreadsheet|table)\b/i.test(lower);
+  const uploadedOrMissingInputSignals =
+    /\b(this|uploaded|attached|file|csv|spreadsheet|dataset|metrics|component)\b/i.test(lower);
 
   const marketResearchSignals =
     /\b(trends|industry|market|country|sector|growth|consumer|startup|economy)\b/i.test(lower);
 
   if (marketResearchSignals) {
+    return false;
+  }
+
+  if (type === "Analytical" && uploadedOrMissingInputSignals) {
     return true;
   }
 
-  return explicitDataSignals;
+  if (type === "Technical" && /\b(this|component|code)\b/i.test(lower)) {
+    return true;
+  }
+
+  return false;
 }
 
 function detectComplexity(text) {
@@ -124,13 +132,13 @@ export function optimizePrompt(userPrompt) {
   
   const complex = uniqueTypes.length > 1 || detectComplexity(stripped);
 
-  if (type === "Analytical" && !hasAnalyticalData(userPrompt)) {
+  if (needsClarification(userPrompt, type)) {
     return {
       compressedPrompt: "",
       type,
       complex,
       notes: [],
-      clarify: "Please share the data, file, or metrics to analyse.",
+      clarify: "Please share the missing input so I can analyze it accurately.",
       shortPrompt,
       tokenCount,
     };
@@ -156,3 +164,4 @@ export function optimizePrompt(userPrompt) {
 }
 
 export { estimateTokens};
+export default optimizePrompt;

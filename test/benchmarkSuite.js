@@ -20,6 +20,7 @@ function normalizeResult(rawResult, input) {
   return {
     original: input,
     optimized:
+      result.compressedPrompt ||
       result.optimizedPrompt ||
       result.optimized ||
       result.output ||
@@ -36,10 +37,11 @@ function normalizeResult(rawResult, input) {
       result.complexity?.isComplex ??
       false,
     shouldClarify:
-      result.shouldClarify ??
-      result.clarify ??
-      result.needsClarification ??
-      Boolean(result.clarification),
+      result.shouldClarify !== undefined
+        ? Boolean(result.shouldClarify)
+        : result.needsClarification !== undefined
+          ? Boolean(result.needsClarification)
+          : Boolean(result.clarify || result.clarification),
     raw: result,
   };
 }

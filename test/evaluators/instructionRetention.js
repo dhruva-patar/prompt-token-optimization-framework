@@ -5,11 +5,13 @@ function includesIgnoreCase(text, term) {
 function normalizeIntent(intent) {
   const map = {
     decide: ["decide", "choose", "should"],
-    compare: ["compare", "comparison"],
+    compare: ["compare", "comparison", "vs", "trade-off", "tradeoffs", "trade-offs"],
     recommend: ["recommend", "suggest"],
     analyze: ["analyze", "analyse", "evaluate", "assess"],
     explain: ["explain", "why", "describe"],
     debug: ["debug", "fix", "troubleshoot"],
+    review: ["review", "critique", "evaluate", "assess"],
+    suggest: ["suggest", "recommend", "propose"],
   };
 
   return map[intent.toLowerCase()] || [intent.toLowerCase()];
