@@ -1,179 +1,253 @@
-# Prompt Token Optimization Framework (PTOF)
+# PTOF — Prompt Token Optimization Framework
 
-A deterministic preprocessing framework that optimizes prompts before sending them to an LLM.
+> Deterministic prompt preprocessing infrastructure for Large Language Models.
 
-PTOF is not a prompt generator.  
-It is a prompt optimizer.
+PTOF is a rule-based optimization framework that classifies, structures, validates, and compresses prompts before inference.
 
----
-
-## 🚀 Why PTOF?
-
-Most LLM issues are not model problems — they are input problems.
-
-PTOF improves:
-
-- clarity
-- structure
-- token efficiency
-- predictability
-
-before inference happens.
+Unlike AI-powered prompt rewriting tools, PTOF focuses on:
+- deterministic behavior
+- explainable transformations
+- semantic safety
+- structural optimization
+- benchmark validation
 
 ---
 
-## 🧠 Core Idea
+# Why PTOF Exists
 
-PTOF acts as a **preprocessing layer** between user input and an LLM.
+Most prompt tooling today behaves like a black box:
 
 ```text
-Raw Prompt → PTOF → Optimized Prompt → LLM
+input → AI rewrite → output
 ```
 
-It ensures:
+This creates problems:
+- unpredictable transformations
+- semantic drift
+- inconsistent outputs
+- impossible benchmarking
+- non-deterministic behavior
+
+PTOF takes a different approach:
 
 ```text
-clean input → controlled output → better results
+input
+→ classify
+→ detect complexity
+→ detect clarification dependency
+→ structurally compress
+→ validate safety
+→ explain reasoning
+→ benchmark deterministically
+```
+
+The framework acts as a preprocessing layer between user input and an LLM.
+
+---
+
+# Core Features
+
+## Deterministic Classification
+
+PTOF classifies prompts into task families such as:
+- Comparative
+- Technical
+- Analytical
+- Decision
+- Creative
+- Strategic
+- Informational
+
+---
+
+## Complexity Detection
+
+Detects:
+- multi-intent prompts
+- trade-off analysis
+- contradictory constraints
+- conditional logic
+- overloaded workflows
+
+---
+
+## Clarification Validation
+
+Identifies when prompts genuinely require additional input before inference.
+
+Examples:
+- uploaded datasets
+- referenced files
+- missing code artifacts
+
+---
+
+## Structural Compression
+
+PTOF performs safe structural compression such as:
+- duplicate reduction
+- repeated intent cleanup
+- redundancy detection
+
+WITHOUT:
+- synonym swapping
+- semantic rewriting
+- AI hallucination risk
+
+---
+
+## Explainability Layer
+
+Every classification and optimization step can be explained deterministically.
+
+Example:
+
+```json
+{
+  "classification": [
+    "Detected Comparative signal: compare.",
+    "Detected Decision signal: recommend."
+  ],
+  "complexity": [
+    "Multiple intent families detected.",
+    "Detected comparison or trade-off signal."
+  ]
+}
 ```
 
 ---
 
-## ⚙️ How It Works
+## Benchmark Infrastructure
 
-PTOF follows a deterministic pipeline:
-
-```text
-Pre-check → Classify → Analytical Check → Strip → Logic Gate → Format → Output
-```
-
-### Key Steps
-
-- **Pre-check**  
-  Skips heavy processing for short prompts (<15 tokens)
-
-- **Classification**  
-  Assigns a single task type (Informational, Decision, etc.)
-
-- **Analytical Check**  
-  Stops execution if required data is missing
-
-- **Strip**  
-  Removes conversational filler
-
-- **Logic Gate**  
-  Preserves conditionals, trade-offs, and structure
-
-- **Adaptive Format**  
-  Adds strict output constraints
+PTOF includes:
+- deterministic benchmark suites
+- noisy real-world prompts
+- semantic safety evaluation
+- type accuracy validation
+- clarification validation
+- benchmark result persistence
 
 ---
 
-## 📦 Output Example
+# Example Pipeline
 
-**Input**
 ```text
-Can you please explain what prompt engineering is?
-```
-
-**Output**
-```text
-Explain what prompt engineering is. Use max 7 bullets.
-```
-
-**Type**
-```text
-Informational
+Raw Prompt
+↓
+Classification
+↓
+Complexity Detection
+↓
+Clarification Check
+↓
+Structural Compression
+↓
+Semantic Validation
+↓
+Explainability Output
+↓
+Optimized Prompt
 ```
 
 ---
 
-## 🛠️ CLI Usage
+# Example Use Cases
 
-Run directly from terminal:
-
-```bash
-node cli/ptof-cli.js "Explain OAuth"
-```
-
-Example output:
-
-```text
-COMPRESSED PROMPT:
-Explain OAuth. Use max 7 bullets.
-
-TYPE:
-Informational
-```
+- prompt preprocessing middleware
+- enterprise AI workflows
+- benchmarkable prompt pipelines
+- safe prompt normalization
+- LLM infrastructure tooling
+- structured AI orchestration systems
 
 ---
 
-## 📁 Project Structure
+# Example Outputs
+
+See:
+
+```text
+docs/examples/
+```
+
+Included examples:
+- noisy founder prompts
+- emotional debugging prompts
+- overloaded AI workflows
+
+---
+
+# Philosophy
+
+PTOF intentionally avoids:
+- LLM-based optimization
+- embeddings
+- vector similarity
+- probabilistic rewriting
+- black-box transformations
+
+The framework prioritizes:
+- explainability
+- reproducibility
+- auditability
+- semantic preservation
+
+---
+
+# Current Status
+
+Current version includes:
+- deterministic optimization pipeline
+- structural compression v0.2
+- noisy benchmark suite v0.3
+- explainability layer v0.4
+- public examples v0.5
+
+---
+
+# Roadmap
+
+## v0.6
+- CLI polish
+- benchmark reporting improvements
+- benchmark diffing
+
+## v0.7
+- architecture diagrams
+- provider-aware optimization
+- expanded benchmark datasets
+
+## v0.8
+- UI integration improvements
+- optimization visualization
+- benchmark dashboards
+
+## v1.0
+- public release
+- stable benchmark suite
+- provider-aware preprocessing
+
+---
+
+# Project Structure
 
 ```text
 core/
-  optimizer.js        # deterministic engine
-
-cli/
-  ptof-cli.js         # CLI interface
-
-pipeline/
-  prompt-pipeline.md  # source-of-truth spec
+ ├── compression/
+ ├── explainability/
+ └── optimizer.js
 
 docs/
-  architecture.md
-  pipeline-explained.md
+ └── examples/
 
-demo-ui/
-  src/lib/ptof.js     # legacy prototype
+test/
+ ├── benchmarkCases/
+ ├── evaluators/
+ └── results/
 ```
 
 ---
 
-## 🧭 Design Principles
-
-PTOF prioritizes:
-
-- deterministic behavior
-- token efficiency
-- meaning preservation
-- bounded outputs
-- explainability
-
-PTOF avoids:
-
-- semantic guessing
-- over-engineering
-- unnecessary rewriting
-
----
-
-## 📌 Status
-
-Current version:
-
-- Core pipeline implemented
-- CLI working
-- Documentation aligned
-- UI integration pending
-
----
-
-## 🔮 Roadmap
-
-- Full alignment with pipeline spec
-- UI integration with core engine
-- Test harness for all prompt types
-- Complex prompt handling improvements
-- Output optimization layer
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome once the core framework stabilizes.
-
----
-
-## 📄 License
+# License
 
 MIT
