@@ -473,4 +473,4 @@ The project intentionally prioritizes:
 
 # License
 
-MI
+MIT
