@@ -1,0 +1,186 @@
+{
+  "generatedAt": "2026-05-12T12:23:46.557Z",
+  "summary": {
+    "pass": 16,
+    "warn": 0,
+    "fail": 0
+  },
+  "cases": [
+    {
+      "case": "Short decision branch merge",
+      "expectedType": "Decision",
+      "actualType": "Decision",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Short technical debugging",
+      "expectedType": "Technical",
+      "actualType": "Technical",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Short compare and recommend",
+      "expectedType": "Comparative",
+      "actualType": "Comparative",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long single-type informational explanation",
+      "expectedType": "Informational",
+      "actualType": "Informational",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 2,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long analytical market explanation without clarification",
+      "expectedType": "Analytical",
+      "actualType": "Analytical",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long technical build and debug prompt",
+      "expectedType": "Technical",
+      "actualType": "Technical",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long strategic comparative recommendation",
+      "expectedType": "Comparative",
+      "actualType": "Comparative",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long product strategy plus roadmap plus metrics",
+      "expectedType": "Creative",
+      "actualType": "Creative",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long uploaded metrics analysis clarification",
+      "expectedType": "Analytical",
+      "actualType": "Analytical",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long multi-intent design critique",
+      "expectedType": "Informational",
+      "actualType": "Informational",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 6,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Long decision plus comparative technical strategy",
+      "expectedType": "Decision",
+      "actualType": "Decision",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Noisy founder strategy prompt",
+      "expectedType": "Decision",
+      "actualType": "Decision",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 2,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Contradictory enterprise requirements",
+      "expectedType": "Creative",
+      "actualType": "Creative",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Emotional debugging prompt",
+      "expectedType": "Technical",
+      "actualType": "Technical",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 6,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Slack style PM prompt",
+      "expectedType": "Comparative",
+      "actualType": "Comparative",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    },
+    {
+      "case": "Overloaded AI workflow prompt",
+      "expectedType": "Comparative",
+      "actualType": "Comparative",
+      "status": "PASS",
+      "semanticRisk": "LOW",
+      "tokenReduction": 0,
+      "instructionRetention": "PASS",
+      "complexityAccuracy": "PASS",
+      "clarifyAccuracy": "PASS"
+    }
+  ]
+}
