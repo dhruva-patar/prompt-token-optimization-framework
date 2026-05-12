@@ -465,4 +465,12 @@ Long-term goals include:
 - enterprise-safe preprocessing layers
 
 The project intentionally prioritizes:
-- correctness bef
+- correctness before intelligence
+- determinism before creativity
+- explainability before automation
+
+---
+
+# License
+
+MI
