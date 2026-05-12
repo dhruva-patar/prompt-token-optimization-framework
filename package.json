@@ -1,0 +1,23 @@
+{
+  "name": "prompt-token-optimization-framework",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Deterministic prompt optimization middleware for LLM inference preprocessing",
+  "main": "core/optimizer.js",
+  "scripts": {
+    "test": "node test/testHarness.js",
+    "complex": "node test/complexHarness.js",
+    "benchmark": "node test/benchmarkSuite.js",
+    "ptof": "node cli/ptof-cli.js"
+  },
+  "keywords": [
+    "prompt-engineering",
+    "llm",
+    "optimization",
+    "middleware",
+    "deterministic-ai",
+    "prompt-optimization"
+  ],
+  "author": "Dhruva Patar",
+  "license": "MIT"
+}
