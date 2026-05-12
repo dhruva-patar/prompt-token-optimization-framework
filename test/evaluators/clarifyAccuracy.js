@@ -1,4 +1,4 @@
-function evaluateClarifyAccuracy(result, expected) {
+export default function evaluateClarifyAccuracy(result, expected) {
   const actual = Boolean(result.shouldClarify);
   const expectedValue = Boolean(expected.shouldClarify);
 
@@ -8,5 +8,3 @@ function evaluateClarifyAccuracy(result, expected) {
     actual,
   };
 }
-
-module.exports = evaluateClarifyAccuracy;

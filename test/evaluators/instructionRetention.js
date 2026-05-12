@@ -12,12 +12,14 @@ function normalizeIntent(intent) {
     debug: ["debug", "fix", "troubleshoot"],
     review: ["review", "critique", "evaluate", "assess"],
     suggest: ["suggest", "recommend", "propose"],
+    create: ["create", "generate", "write", "propose"],
+    identify: ["identify", "find", "surface"],
   };
 
   return map[intent.toLowerCase()] || [intent.toLowerCase()];
 }
 
-function evaluateInstructionRetention(result, expected) {
+export default function evaluateInstructionRetention(result, expected) {
   const optimized = result.optimized || "";
 
   const missingTerms = (expected.criticalTerms || []).filter(
@@ -56,5 +58,3 @@ function evaluateInstructionRetention(result, expected) {
     notes,
   };
 }
-
-module.exports = evaluateInstructionRetention;

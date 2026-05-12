@@ -1,12 +1,9 @@
 function estimateTokens(text) {
   if (!text || typeof text !== "string") return 0;
-
-  // Simple deterministic approximation.
-  // Good enough for benchmark comparison without external dependencies.
   return Math.ceil(text.trim().split(/\s+/).filter(Boolean).length * 1.3);
 }
 
-function evaluateTokenEfficiency(original, optimized) {
+export default function evaluateTokenEfficiency(original, optimized) {
   const originalTokens = estimateTokens(original);
   const optimizedTokens = estimateTokens(optimized);
 
@@ -32,5 +29,3 @@ function evaluateTokenEfficiency(original, optimized) {
     status,
   };
 }
-
-module.exports = evaluateTokenEfficiency;

@@ -1,27 +1,26 @@
-const evaluateTypeAccuracy = require("./evaluators/typeAccuracy");
+import fs from "fs";
+import path from "path";
 
-const benchmarkCases = require("./benchmarkCases");
+import benchmarkCases from "./benchmarkCases.js";
+import noisyPrompts from "./benchmarkCases/noisyPrompts.js";
 
-const noisyPrompts = require("./benchmarkCases/noisyPrompts");
+import evaluateInstructionRetention from "./evaluators/instructionRetention.js";
+import evaluateSemanticRisk from "./evaluators/semanticRisk.js";
+import evaluateTokenEfficiency from "./evaluators/tokenEfficiency.js";
+import evaluateComplexityAccuracy from "./evaluators/complexityAccuracy.js";
+import evaluateClarifyAccuracy from "./evaluators/clarifyAccuracy.js";
+import evaluateTypeAccuracy from "./evaluators/typeAccuracy.js";
+
+import optimizerModule, { optimizePrompt as namedOptimizePrompt } from "../core/optimizer.js";
+
 const allBenchmarks = [
   ...benchmarkCases,
-  ...noisyPrompts
+  ...noisyPrompts,
 ];
 
-const fs = require("fs");
-const path = require("path");
-
-const evaluateInstructionRetention = require("./evaluators/instructionRetention");
-const evaluateSemanticRisk = require("./evaluators/semanticRisk");
-const evaluateTokenEfficiency = require("./evaluators/tokenEfficiency");
-const evaluateComplexityAccuracy = require("./evaluators/complexityAccuracy");
-const evaluateClarifyAccuracy = require("./evaluators/clarifyAccuracy");
-
-const optimizerModule = require("../core/optimizer");
-
 const optimizePrompt =
+  namedOptimizePrompt ||
   optimizerModule.optimizePrompt ||
-  optimizerModule.optimize ||
   optimizerModule.default ||
   optimizerModule;
 
@@ -59,11 +58,11 @@ function normalizeResult(rawResult, input) {
 
 function getOverallStatus(evaluations) {
   const statuses = [
+    evaluations.typeAccuracy.status,
     evaluations.instructionRetention.status,
     evaluations.tokenEfficiency.status,
     evaluations.complexityAccuracy.status,
     evaluations.clarifyAccuracy.status,
-    evaluations.typeAccuracy.status,
   ];
 
   if (evaluations.semanticRisk.risk === "HIGH") return "FAIL";
@@ -85,21 +84,26 @@ function printCaseReport(testCase, result, evaluations, overallStatus) {
   console.log(`Reduction: ${evaluations.tokenEfficiency.reductionPercent}%`);
   console.log("");
   console.log(`Instruction Retention: ${evaluations.instructionRetention.status}`);
+
   if (evaluations.instructionRetention.missingTerms.length) {
     console.log(`  Missing terms: ${evaluations.instructionRetention.missingTerms.join(", ")}`);
   }
+
   if (evaluations.instructionRetention.missingIntents.length) {
     console.log(`  Missing intents: ${evaluations.instructionRetention.missingIntents.join(", ")}`);
   }
+
   console.log(`Semantic Risk: ${evaluations.semanticRisk.risk}`);
+
   if (evaluations.semanticRisk.reasons.length) {
     evaluations.semanticRisk.reasons.forEach((reason) => console.log(`  - ${reason}`));
   }
+
   console.log(`Complexity Detection: ${evaluations.complexityAccuracy.status}`);
   console.log(`Clarification Logic: ${evaluations.clarifyAccuracy.status}`);
+  console.log(`Type Accuracy: ${evaluations.typeAccuracy.status}`);
   console.log("");
   console.log(`Result: ${overallStatus}`);
-  console.log(`Type Accuracy: ${evaluations.typeAccuracy.status}`);
 }
 
 function runBenchmarkSuite() {
@@ -124,28 +128,28 @@ function runBenchmarkSuite() {
     const result = normalizeResult(rawResult, testCase.input);
 
     const evaluations = {
+      typeAccuracy: evaluateTypeAccuracy(result, testCase.expected),
       instructionRetention: evaluateInstructionRetention(result, testCase.expected),
       semanticRisk: evaluateSemanticRisk(result, testCase.expected),
       tokenEfficiency: evaluateTokenEfficiency(result.original, result.optimized),
       complexityAccuracy: evaluateComplexityAccuracy(result, testCase.expected),
       clarifyAccuracy: evaluateClarifyAccuracy(result, testCase.expected),
-      typeAccuracy: evaluateTypeAccuracy(result, testCase.expected),
     };
 
     const overallStatus = getOverallStatus(evaluations);
 
     results.push({
-    case: testCase.name,
-    expectedType: testCase.expected.type,
-    actualType: result.type,
-    status: overallStatus,
-    semanticRisk: evaluations.semanticRisk.risk,
-    tokenReduction: evaluations.tokenEfficiency.reductionPercent,
-    instructionRetention: evaluations.instructionRetention.status,
-    complexityAccuracy: evaluations.complexityAccuracy.status,
-    clarifyAccuracy: evaluations.clarifyAccuracy.status,
-    
-  });
+      case: testCase.name,
+      expectedType: testCase.expected.type,
+      actualType: result.type,
+      status: overallStatus,
+      semanticRisk: evaluations.semanticRisk.risk,
+      tokenReduction: evaluations.tokenEfficiency.reductionPercent,
+      typeAccuracy: evaluations.typeAccuracy.status,
+      instructionRetention: evaluations.instructionRetention.status,
+      complexityAccuracy: evaluations.complexityAccuracy.status,
+      clarifyAccuracy: evaluations.clarifyAccuracy.status,
+    });
 
     if (overallStatus === "PASS") pass += 1;
     if (overallStatus === "WARN") warn += 1;
@@ -161,29 +165,29 @@ function runBenchmarkSuite() {
   console.log(`WARN: ${warn}`);
   console.log(`FAIL: ${fail}`);
 
-  const resultsDir = path.join(__dirname, "results");
+  const resultsDir = path.join(process.cwd(), "test", "results");
 
-if (!fs.existsSync(resultsDir)) {
-  fs.mkdirSync(resultsDir, { recursive: true });
-}
+  if (!fs.existsSync(resultsDir)) {
+    fs.mkdirSync(resultsDir, { recursive: true });
+  }
 
-const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-const resultsPath = path.join(resultsDir, `benchmark-${timestamp}.json`);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const resultsPath = path.join(resultsDir, `benchmark-${timestamp}.json`);
 
-fs.writeFileSync(
-  resultsPath,
-  JSON.stringify(
-    {
-      generatedAt: new Date().toISOString(),
-      summary: { pass, warn, fail },
-      cases: results,
-    },
-    null,
-    2
-  )
-);
+  fs.writeFileSync(
+    resultsPath,
+    JSON.stringify(
+      {
+        generatedAt: new Date().toISOString(),
+        summary: { pass, warn, fail },
+        cases: results,
+      },
+      null,
+      2
+    )
+  );
 
-console.log(`\nSaved benchmark results: ${resultsPath}`);
+  console.log(`\nSaved benchmark results: ${resultsPath}`);
 
   if (fail > 0) {
     process.exitCode = 1;

@@ -7,20 +7,10 @@ const noisyPrompts = [
       type: "Decision",
       complex: true,
       shouldClarify: false,
-      criticalTerms: [
-        "PTOF",
-        "SaaS",
-        "open source",
-        "middleware",
-        "AI tooling"
-      ],
-      requiredIntents: [
-        "explain",
-        "recommend"
-      ]
-    }
+      criticalTerms: ["PTOF", "SaaS", "open source", "middleware", "AI tooling"],
+      requiredIntents: ["explain", "recommend"],
+    },
   },
-
   {
     name: "Contradictory enterprise requirements",
     input:
@@ -29,18 +19,10 @@ const noisyPrompts = [
       type: "Creative",
       complex: true,
       shouldClarify: false,
-      criticalTerms: [
-        "executive summary",
-        "technical details",
-        "implementation timelines",
-        "stakeholder concerns"
-      ],
-      requiredIntents: [
-        "create"
-      ]
-    }
+      criticalTerms: ["executive summary", "technical details", "implementation timelines", "stakeholder concerns"],
+      requiredIntents: ["create"],
+    },
   },
-
   {
     name: "Emotional debugging prompt",
     input:
@@ -49,17 +31,10 @@ const noisyPrompts = [
       type: "Technical",
       complex: true,
       shouldClarify: false,
-      criticalTerms: [
-        "React",
-        "tablet",
-        "mobile"
-      ],
-      requiredIntents: [
-        "explain"
-      ]
-    }
+      criticalTerms: ["React", "tablet", "mobile"],
+      requiredIntents: ["explain"],
+    },
   },
-
   {
     name: "Slack style PM prompt",
     input:
@@ -68,19 +43,10 @@ const noisyPrompts = [
       type: "Comparative",
       complex: true,
       shouldClarify: false,
-      criticalTerms: [
-        "onboarding",
-        "activation",
-        "cognitive load",
-        "SaaS"
-      ],
-      requiredIntents: [
-        "compare",
-        "suggest"
-      ]
-    }
+      criticalTerms: ["onboarding", "activation", "cognitive load", "SaaS"],
+      requiredIntents: ["compare", "suggest"],
+    },
   },
-
   {
     name: "Overloaded AI workflow prompt",
     input:
@@ -89,24 +55,10 @@ const noisyPrompts = [
       type: "Comparative",
       complex: true,
       shouldClarify: false,
-      criticalTerms: [
-        "GPT",
-        "Claude",
-        "Gemini",
-        "enterprise analysis",
-        "architecture reviews",
-        "benchmark metrics"
-      ],
-      requiredIntents: [
-        "compare",
-        "recommend",
-        "explain",
-        "create",
-        "suggest",
-        "identify"
-      ]
-    }
-  }
+      criticalTerms: ["GPT", "Claude", "Gemini", "enterprise analysis", "architecture reviews", "benchmark metrics"],
+      requiredIntents: ["compare", "recommend", "explain", "create", "suggest", "identify"],
+    },
+  },
 ];
 
-module.exports = noisyPrompts;
+export default noisyPrompts;

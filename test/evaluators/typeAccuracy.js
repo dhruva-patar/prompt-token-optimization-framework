@@ -1,4 +1,4 @@
-function evaluateTypeAccuracy(result, expected) {
+export default function evaluateTypeAccuracy(result, expected) {
   const actual = result.type;
   const expectedType = expected.type;
 
@@ -8,5 +8,3 @@ function evaluateTypeAccuracy(result, expected) {
     actual,
   };
 }
-
-module.exports = evaluateTypeAccuracy;

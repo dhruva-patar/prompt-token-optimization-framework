@@ -15,7 +15,7 @@ function detectRemovedPattern(original, optimized, pattern, label) {
     : null;
 }
 
-function evaluateSemanticRisk(result, expected) {
+export default function evaluateSemanticRisk(result, expected) {
   const original = result.original || "";
   const optimized = result.optimized || "";
   const reasons = [];
@@ -53,5 +53,3 @@ function evaluateSemanticRisk(result, expected) {
     reasons,
   };
 }
-
-module.exports = evaluateSemanticRisk;

@@ -1,4 +1,4 @@
-function evaluateComplexityAccuracy(result, expected) {
+export default function evaluateComplexityAccuracy(result, expected) {
   const actual = Boolean(result.complex);
   const expectedValue = Boolean(expected.complex);
 
@@ -8,5 +8,3 @@ function evaluateComplexityAccuracy(result, expected) {
     actual,
   };
 }
-
-module.exports = evaluateComplexityAccuracy;

@@ -1,9 +1,4 @@
 const benchmarkCases = [
-  // ========================
-  // SHORT PROMPTS <= 100 chars
-  // 30% of suite: 3 / 10
-  // ========================
-
   {
     name: "Short decision branch merge",
     input: "Should I merge this branch before cleanup?",
@@ -16,7 +11,6 @@ const benchmarkCases = [
       requiredIntents: ["decide"],
     },
   },
-
   {
     name: "Short technical debugging",
     input: "Debug this React layout issue on mobile.",
@@ -29,7 +23,6 @@ const benchmarkCases = [
       requiredIntents: ["debug"],
     },
   },
-
   {
     name: "Short compare and recommend",
     input: "Compare Claude and GPT for code review and recommend one.",
@@ -42,12 +35,6 @@ const benchmarkCases = [
       requiredIntents: ["compare", "recommend"],
     },
   },
-
-  // ========================
-  // LONG PROMPTS >= 300 chars
-  // 70% of suite: 7 / 10
-  // ========================
-
   {
     name: "Long single-type informational explanation",
     input:
@@ -61,7 +48,6 @@ const benchmarkCases = [
       requiredIntents: ["explain"],
     },
   },
-
   {
     name: "Long analytical market explanation without clarification",
     input:
@@ -75,7 +61,6 @@ const benchmarkCases = [
       requiredIntents: ["analyze", "explain"],
     },
   },
-
   {
     name: "Long technical build and debug prompt",
     input:
@@ -89,7 +74,6 @@ const benchmarkCases = [
       requiredIntents: ["debug", "explain", "suggest"],
     },
   },
-
   {
     name: "Long strategic comparative recommendation",
     input:
@@ -103,7 +87,6 @@ const benchmarkCases = [
       requiredIntents: ["compare", "recommend"],
     },
   },
-
   {
     name: "Long product strategy plus roadmap plus metrics",
     input:
@@ -117,7 +100,6 @@ const benchmarkCases = [
       requiredIntents: ["create", "explain", "compare", "recommend"],
     },
   },
-
   {
     name: "Long uploaded metrics analysis clarification",
     input:
@@ -131,7 +113,6 @@ const benchmarkCases = [
       requiredIntents: ["analyze", "compare", "explain", "recommend"],
     },
   },
-
   {
     name: "Long multi-intent design critique",
     input:
@@ -145,7 +126,6 @@ const benchmarkCases = [
       requiredIntents: ["review", "explain", "compare", "suggest", "recommend"],
     },
   },
-
   {
     name: "Long decision plus comparative technical strategy",
     input:
@@ -161,4 +141,4 @@ const benchmarkCases = [
   },
 ];
 
-module.exports = benchmarkCases;
+export default benchmarkCases;
