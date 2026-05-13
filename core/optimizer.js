@@ -3,7 +3,7 @@ import { classifyPrompt } from "./classification/classifyPrompt.js";
 import { detectTypeSignals } from "./classification/detectTypeSignals.js";
 import { detectComplexity } from "./complexity/detectComplexity.js";
 import { needsClarification } from "./clarification/needsClarification.js";
-
+import { runLongPromptStructurer } from "./structure/longPromptStructurer.js";
 
 function estimateTokens(text) {
   if (!text || !text.trim()) return 0;
@@ -82,11 +82,17 @@ export function optimizePrompt(userPrompt) {
   const formatRule = getDefaultFormat(type);
 
   const cleanStripped = stripped.replace(/[?.!]+$/, "");
-  //const compressedCore = compressBasic(cleanStripped);
-  
-  const pipelineResult = runCompressionPipeline(compressBasic(cleanStripped));
-  const compressedCore = pipelineResult.compressedText;
-  
+  //const pipelineResult = runCompressionPipeline(compressBasic(cleanStripped));
+  //const compressedCore = pipelineResult.compressedText;
+  const structureResult = runLongPromptStructurer(cleanStripped);
+
+  const pipelineResult = runCompressionPipeline(
+    compressBasic(structureResult.structuredText)
+  );
+
+  const compressedCore = pipelineResult.compressedText;  
+
+
   const compressedPrompt = `${compressedCore}.`; 
   
 
@@ -96,6 +102,7 @@ export function optimizePrompt(userPrompt) {
     complex,
     notes: [
       ...(shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : []),
+      ...structureResult.structureNotes,
       ...pipelineResult.compressionNotes,
     ],
     clarify: "",
