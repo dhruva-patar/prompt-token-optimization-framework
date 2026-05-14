@@ -4,6 +4,7 @@ import { detectTypeSignals } from "./classification/detectTypeSignals.js";
 import { detectComplexity } from "./complexity/detectComplexity.js";
 import { needsClarification } from "./clarification/needsClarification.js";
 import { runLongPromptStructurer } from "./structure/longPromptStructurer.js";
+import { blendFormats } from "./formatting/blendFormats.js";
 
 function estimateTokens(text) {
   if (!text || !text.trim()) return 0;
@@ -17,27 +18,13 @@ function stripFiller(text) {
     .trim();
 }
 
-function getDefaultFormat(type) {
-  const formats = {
-    Informational: "Use max 7 bullets.",
-    Decision: "Give max 3 options with 1 trade-off line each.",
-    Comparative: "Use 2-column comparison, max 5 rows.",
-    Creative: "Give 2 variants only.",
-    Strategic: "Use max 3 sections.",
-    Technical: "Use numbered steps only.",
-    Analytical: "Give max 3 findings with 1 impact line each.",
-  };
-
-  return formats[type] || formats.Informational;
-}
-
 function compressBasic(text) {
   return text
     .replace(/\bwhat is\b/gi, "Explain")
     .replace(/\bcompare it with\b/gi, "vs")
     .replace(/\bsuggest one for\b/gi, "Recommend one for")
     .replace(/\ba customer support chat function\b/gi, "customer support chat")
-    .replace(/\s+/g, " ")
+    .replace(/[ \t]+/g, " ")
     .trim();
 }
 
@@ -79,11 +66,9 @@ export function optimizePrompt(userPrompt) {
     };
   }
 
-  const formatRule = getDefaultFormat(type);
+  const formatRule = blendFormats(type, typeSignals, complex);
 
   const cleanStripped = stripped.replace(/[?.!]+$/, "");
-  //const pipelineResult = runCompressionPipeline(compressBasic(cleanStripped));
-  //const compressedCore = pipelineResult.compressedText;
   const structureResult = runLongPromptStructurer(cleanStripped);
 
   const pipelineResult = runCompressionPipeline(

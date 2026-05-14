@@ -74,7 +74,9 @@ export function formatItemBlocks(itemBlocks) {
   return itemBlocks
     .map((block, index) => {
       const values = block.values.length
-        ? `\n   Value / Notes:\n${block.values.map((value) => `   - ${value}`).join("\n")}`
+        ? `\n   Value / Notes:\n${block.values
+            .map((value) => `   - ${value}`)
+            .join("\n")}`
         : "";
 
       return `${index + 1}. ${block.item}${values}`;

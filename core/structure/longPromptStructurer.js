@@ -2,10 +2,12 @@ import { extractReferences } from "./extractReferences.js";
 import { extractConstraints } from "./detectConstraintSignals.js";
 import { extractOutputRequests } from "./detectOutputRequest.js";
 import { buildStructuredPrompt } from "./buildStructuredPrompt.js";
+import { buildCompactStructuredPrompt } from "./buildCompactStructuredPrompt.js";
 import {
   extractItemBlocks,
   formatItemBlocks,
 } from "./extractItemBlocks.js";
+import { isWithinStructureBudget } from "./structureBudget.js";
 
 function shouldStructurePrompt(text) {
   if (!text || typeof text !== "string") return false;
@@ -24,7 +26,7 @@ function shouldStructurePrompt(text) {
 
 function cleanText(text) {
   return (text || "")
-    .replace(/\s{2,}/g, " ")
+    .replace(/[ \t]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
@@ -35,6 +37,8 @@ export function runLongPromptStructurer(text) {
       structuredText: text,
       structureNotes: [],
       applied: false,
+      structureMode: "none",
+      budget: null,
     };
   }
 
@@ -56,13 +60,22 @@ export function runLongPromptStructurer(text) {
 
   const remainingText = cleanText(textWithoutOutputRequests);
 
-  const structuredText = buildStructuredPrompt({
+  const structurePayload = {
     task: remainingText || textWithoutItemBlocks || textWithoutReferences || text,
     references,
     constraints,
     outputRequests,
     itemBlocks: itemBlockText,
-  });
+  };
+
+  const balancedStructuredText = buildStructuredPrompt(structurePayload);
+  const budget = isWithinStructureBudget(text, balancedStructuredText);
+
+  const structuredText = budget.withinBudget
+    ? balancedStructuredText
+    : buildCompactStructuredPrompt(structurePayload);
+
+  const structureMode = budget.withinBudget ? "balanced" : "compact";
 
   const structureNotes = [];
 
@@ -82,6 +95,12 @@ export function runLongPromptStructurer(text) {
     structureNotes.push(`Extracted ${outputRequests.length} output request(s).`);
   }
 
+  if (!budget.withinBudget) {
+    structureNotes.push(
+      `Used compact structure because balanced structure increased tokens by ${budget.increasePercent}%.`
+    );
+  }
+
   if (!structureNotes.length) {
     structureNotes.push("Applied long prompt structural normalization.");
   }
@@ -90,5 +109,7 @@ export function runLongPromptStructurer(text) {
     structuredText: structuredText || text,
     structureNotes,
     applied: true,
+    structureMode,
+    budget,
   };
 }
