@@ -52,26 +52,7 @@ function reduceRepeatedIntentVerbs(text) {
   return result;
 }
 
-/*function removeDuplicateSentences(text) {
-  const sentenceParts = text
-    .split(/(?<=[.!?])\s+/)
-    .map((sentence) => sentence.trim())
-    .filter(Boolean);
 
-  const seen = new Set();
-  const uniqueSentences = [];
-
-  sentenceParts.forEach((sentence) => {
-    const normalized = sentence.toLowerCase().replace(/[^\w\s]/g, "").trim();
-
-    if (!seen.has(normalized)) {
-      seen.add(normalized);
-      uniqueSentences.push(sentence);
-    }
-  });
-
-  return uniqueSentences.join(" ");
-}*/
 
 function removeDuplicateSentences(text) {
   if (/^[A-Z /]+:/m.test(text)) {
