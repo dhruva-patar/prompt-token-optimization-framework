@@ -21,7 +21,7 @@ function shouldStructurePrompt(text) {
     ((text.match(/\s+-\s+/g) || []).length >= 3) ||
     ((text.match(/\bValue\s*:/gi) || []).length >= 2);
 
-  return hasUrl || hasLineBreaks || hasLongPrompt || hasMessySpacing || hasRepeatedBlocks;
+  return hasUrl || hasLineBreaks || hasMessySpacing || hasRepeatedBlocks;
 }
 
 function cleanText(text) {

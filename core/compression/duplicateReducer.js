@@ -76,6 +76,17 @@ function removeDuplicateSentences(text) {
     }
   });
 
+  if (sentenceParts.length === 0) {
+    return text;
+  }
+
+  const reductionRatio =
+    uniqueSentences.length / sentenceParts.length;
+
+  if (reductionRatio < 0.6) {
+    return text;
+  }
+
   return uniqueSentences.join(" ");
 }
 

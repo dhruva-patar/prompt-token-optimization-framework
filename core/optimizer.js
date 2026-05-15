@@ -52,7 +52,9 @@ export function optimizePrompt(userPrompt) {
   const typeSignals = detectTypeSignals(userPrompt);
   const uniqueTypes = [...new Set(typeSignals.map((signal) => signal.type))];
   
-  const complex = uniqueTypes.length > 1 || detectComplexity(stripped);
+  const complex =
+  detectComplexity(stripped) ||
+  uniqueTypes.length >= 2;
 
   if (needsClarification(userPrompt, type)) {
     return {
