@@ -5,6 +5,7 @@ import { detectComplexity } from "./complexity/detectComplexity.js";
 import { needsClarification } from "./clarification/needsClarification.js";
 import { runLongPromptStructurer } from "./structure/longPromptStructurer.js";
 import { blendFormats } from "./formatting/blendFormats.js";
+import { applyResponseMode } from "./responseModes/applyResponseMode.js";
 
 function estimateTokens(text) {
   if (!text || !text.trim()) return 0;
@@ -14,7 +15,7 @@ function estimateTokens(text) {
 function stripFiller(text) {
   return text
     .replace(/\b(please|could you|can you help me|can you|i want to know|i was wondering)\b/gi, "")
-    .replace(/\s+/g, " ")
+    .replace(/[ \t]+/g, " ")
     .trim();
 }
 
@@ -28,7 +29,9 @@ function compressBasic(text) {
     .trim();
 }
 
-export function optimizePrompt(userPrompt) {
+export function optimizePrompt(userPrompt, options = {}) {
+  const responseModeOption = options.responseMode || "default";
+
   if (!userPrompt || !userPrompt.trim()) {
     return {
       compressedPrompt: "",
@@ -39,22 +42,25 @@ export function optimizePrompt(userPrompt) {
       clarify: "",
       shortPrompt: false,
       tokenCount: 0,
+      responseMode: {
+        key: "default",
+        displayName: "Default",
+        instruction: "",
+      },
     };
   }
 
   const tokenCount = estimateTokens(userPrompt);
   const shortPrompt = tokenCount < 15;
 
-  let type = classifyPrompt(userPrompt); 
-  
+  const type = classifyPrompt(userPrompt);
+
   const stripped = shortPrompt ? userPrompt.trim() : stripFiller(userPrompt);
-  
+
   const typeSignals = detectTypeSignals(userPrompt);
   const uniqueTypes = [...new Set(typeSignals.map((signal) => signal.type))];
-  
-  const complex =
-  detectComplexity(stripped) ||
-  uniqueTypes.length >= 2;
+
+  const complex = uniqueTypes.length > 1 || detectComplexity(stripped);
 
   if (needsClarification(userPrompt, type)) {
     return {
@@ -65,6 +71,7 @@ export function optimizePrompt(userPrompt) {
       clarify: "Please share the missing input so I can analyze it accurately.",
       shortPrompt,
       tokenCount,
+      formatRule: blendFormats(type, typeSignals, complex),
     };
   }
 
@@ -77,27 +84,34 @@ export function optimizePrompt(userPrompt) {
     compressBasic(structureResult.structuredText)
   );
 
-  const compressedCore = pipelineResult.compressedText;  
+  const compressedCore = pipelineResult.compressedText;
 
+  const baseCompressedPrompt = `${compressedCore}.`;
 
-  const compressedPrompt = `${compressedCore}.`; 
-  
+  const responseModeResult = applyResponseMode(
+    baseCompressedPrompt,
+    responseModeOption
+  );
 
   return {
-    compressedPrompt,
+    compressedPrompt: responseModeResult.prompt,
     type,
     complex,
     notes: [
       ...(shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : []),
       ...structureResult.structureNotes,
       ...pipelineResult.compressionNotes,
+      ...(responseModeResult.applied
+        ? [`Applied response mode: ${responseModeResult.responseMode.displayName}`]
+        : []),
     ],
     clarify: "",
     shortPrompt,
     tokenCount,
     formatRule,
+    responseMode: responseModeResult.responseMode,
   };
 }
 
-export { estimateTokens};
+export { estimateTokens };
 export default optimizePrompt;

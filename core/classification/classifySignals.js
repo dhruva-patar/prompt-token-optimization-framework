@@ -6,7 +6,7 @@ export const classificationSignals = [
   },
   {
     type: "Decision",
-    pattern: /\b(best|recommend|should i|decide|choose|suggest one|which)\b/g,
+    pattern: /\b(best|recommend|should i|should we|decide|choose|suggest one|which)\b/g,
     weight: 2,
   },
   {

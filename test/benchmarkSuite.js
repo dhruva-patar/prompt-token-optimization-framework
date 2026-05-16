@@ -3,6 +3,8 @@ import path from "path";
 
 import benchmarkCases from "./benchmarkCases.js";
 import noisyPrompts from "./benchmarkCases/noisyPrompts.js";
+//import longPromptStructuringCases from "./benchmarkCases/longPromptStructuring.js";
+import responseModeCases from "./benchmarkCases/responseModeCases.js";
 
 import evaluateInstructionRetention from "./evaluators/instructionRetention.js";
 import evaluateSemanticRisk from "./evaluators/semanticRisk.js";
@@ -13,9 +15,14 @@ import evaluateTypeAccuracy from "./evaluators/typeAccuracy.js";
 
 import optimizerModule, { optimizePrompt as namedOptimizePrompt } from "../core/optimizer.js";
 
+
+import evaluateResponseModeAccuracy from "./evaluators/responseModeAccuracy.js";
+
 const allBenchmarks = [
   ...benchmarkCases,
   ...noisyPrompts,
+ // ...longPromptStructuringCases,
+  ...responseModeCases,
 ];
 
 const optimizePrompt =
@@ -63,6 +70,7 @@ function getOverallStatus(evaluations) {
     evaluations.tokenEfficiency.status,
     evaluations.complexityAccuracy.status,
     evaluations.clarifyAccuracy.status,
+    evaluations.responseModeAccuracy.status,
   ];
 
   if (evaluations.semanticRisk.risk === "HIGH") return "FAIL";
@@ -102,6 +110,11 @@ function printCaseReport(testCase, result, evaluations, overallStatus) {
   console.log(`Complexity Detection: ${evaluations.complexityAccuracy.status}`);
   console.log(`Clarification Logic: ${evaluations.clarifyAccuracy.status}`);
   console.log(`Type Accuracy: ${evaluations.typeAccuracy.status}`);
+  console.log(`Response Mode Accuracy: ${evaluations.responseModeAccuracy.status}`);
+
+  if (result.raw?.responseMode?.displayName) {
+    console.log(`Selected Mode: ${result.raw.responseMode.displayName}`);
+  }
   console.log("");
   console.log(`Result: ${overallStatus}`);
 }
@@ -117,7 +130,7 @@ function runBenchmarkSuite() {
     let rawResult;
 
     try {
-      rawResult = optimizePrompt(testCase.input);
+      rawResult = optimizePrompt(testCase.input, testCase.options || {});
     } catch (error) {
       console.error(`\nFAILED TO RUN OPTIMIZER FOR CASE: ${testCase.name}`);
       console.error(error);
@@ -131,9 +144,16 @@ function runBenchmarkSuite() {
       typeAccuracy: evaluateTypeAccuracy(result, testCase.expected),
       instructionRetention: evaluateInstructionRetention(result, testCase.expected),
       semanticRisk: evaluateSemanticRisk(result, testCase.expected),
-      tokenEfficiency: evaluateTokenEfficiency(result.original, result.optimized),
+      
+      tokenEfficiency: evaluateTokenEfficiency(
+        result.original,
+        result.optimized,
+        testCase.expected
+      ),
+
       complexityAccuracy: evaluateComplexityAccuracy(result, testCase.expected),
       clarifyAccuracy: evaluateClarifyAccuracy(result, testCase.expected),
+      responseModeAccuracy: evaluateResponseModeAccuracy(result, testCase.expected),
     };
 
     const overallStatus = getOverallStatus(evaluations);
@@ -164,7 +184,7 @@ function runBenchmarkSuite() {
   console.log(`PASS: ${pass}`);
   console.log(`WARN: ${warn}`);
   console.log(`FAIL: ${fail}`);
-
+  
   const resultsDir = path.join(process.cwd(), "test", "results");
 
   if (!fs.existsSync(resultsDir)) {

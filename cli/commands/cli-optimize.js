@@ -1,16 +1,23 @@
 import { optimizePrompt } from "../../core/optimizer.js";
 
-const prompt = process.argv.slice(3).join(" ");
+const args = process.argv.slice(3);
+
+const modeArg = args.find((arg) => arg.startsWith("--mode="));
+const responseMode = modeArg ? modeArg.replace("--mode=", "") : "default";
+
+const prompt = args
+  .filter((arg) => !arg.startsWith("--mode="))
+  .join(" ");
 
 if (!prompt) {
   console.log("");
   console.log("Missing prompt.");
-  console.log('Usage: node cli/ptof-cli.js optimize "your prompt here"');
+  console.log('Usage: node cli/ptof-cli.js optimize "your prompt here" --mode=challenge_my_views');
   console.log("");
   process.exit(1);
 }
 
-const result = optimizePrompt(prompt);
+const result = optimizePrompt(prompt, { responseMode });
 
 console.log("");
 console.log("========================");
@@ -21,13 +28,6 @@ if (result.clarify) {
   console.log("");
   console.log("CLARIFY:");
   console.log(result.clarify);
-
-  if (result.explanation) {
-    console.log("");
-    console.log("EXPLANATION:");
-    console.log(JSON.stringify(result.explanation, null, 2));
-  }
-
   process.exit(0);
 }
 
@@ -39,6 +39,12 @@ console.log("");
 console.log("TYPE:");
 console.log(`${result.type}${result.complex ? " complex" : ""}`);
 
+if (result.responseMode?.displayName) {
+  console.log("");
+  console.log("SELECTED MODE:");
+  console.log(result.responseMode.displayName);
+}
+
 if (result.formatRule) {
   console.log("");
   console.log("FORMAT RULE:");
@@ -49,12 +55,6 @@ if (result.notes && result.notes.length) {
   console.log("");
   console.log("NOTES:");
   result.notes.forEach((note) => console.log(`- ${note}`));
-}
-
-if (result.explanation) {
-  console.log("");
-  console.log("EXPLANATION:");
-  console.log(JSON.stringify(result.explanation, null, 2));
 }
 
 console.log("");

@@ -7,10 +7,10 @@ function detectPrimaryIntentOverride(text) {
   const lower = (text || "").toLowerCase();
 
   const startsWithCompare = /^\s*(compare|vs|versus)\b/i.test(lower);
-  const startsWithDecision = /^\s*(should i|decide|choose|recommend)\b/i.test(lower);
   const startsWithCreate = /^\s*(create|write|generate)\b/i.test(lower);
   const startsWithAnalyze = /^\s*(analyze|analyse|evaluate|assess)\b/i.test(lower);
   const startsWithDebug = /^\s*(debug|fix|troubleshoot)\b/i.test(lower);
+  const startsWithDecision = /^\s*(should i|should we|decide|choose|recommend)\b/i.test(lower);
 
   if (startsWithCompare) return "Comparative";
   if (startsWithDecision) return "Decision";
