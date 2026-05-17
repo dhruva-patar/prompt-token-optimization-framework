@@ -5,15 +5,19 @@ export function applyResponseMode(prompt, responseMode = "default") {
 
   if (!mode.instruction) {
     return {
-      prompt,
+      finalPrompt: prompt,
       responseMode: mode,
       applied: false,
+      enhancementBlock: "",
     };
   }
 
+  const enhancementBlock = `RESPONSE CONTRACT:\n- ${mode.instruction}`;
+
   return {
-    prompt: `${prompt}\n\nRESPONSE MODE:\n- ${mode.instruction}`,
+    finalPrompt: `${prompt}\n\n${enhancementBlock}`,
     responseMode: mode,
     applied: true,
+    enhancementBlock,
   };
 }

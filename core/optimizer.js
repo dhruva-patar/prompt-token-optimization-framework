@@ -94,7 +94,9 @@ export function optimizePrompt(userPrompt, options = {}) {
   );
 
   return {
-    compressedPrompt: responseModeResult.prompt,
+    compressedPrompt: baseCompressedPrompt,
+    finalPrompt: responseModeResult.finalPrompt,
+    responseEnhancementBlock: responseModeResult.enhancementBlock,
     type,
     complex,
     notes: [

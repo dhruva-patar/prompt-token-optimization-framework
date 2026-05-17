@@ -32,8 +32,12 @@ if (result.clarify) {
 }
 
 console.log("");
-console.log("COMPRESSED PROMPT:");
+console.log("CORE COMPRESSED PROMPT:");
 console.log(result.compressedPrompt);
+
+console.log("");
+console.log("FINAL LLM-READY PROMPT:");
+console.log(result.finalPrompt || result.compressedPrompt);
 
 console.log("");
 console.log("TYPE:");

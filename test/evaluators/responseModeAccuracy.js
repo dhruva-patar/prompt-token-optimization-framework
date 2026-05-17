@@ -10,9 +10,14 @@ export default function evaluateResponseModeAccuracy(result, expected) {
 
   const actual = result.raw?.responseMode?.key;
 
+  const finalPrompt =
+    result.raw?.finalPrompt ||
+    result.optimized ||
+    "";
+
   const hasInstruction =
-    typeof result.optimized === "string" &&
-    result.optimized.includes("RESPONSE MODE:");
+    typeof finalPrompt === "string" &&
+    finalPrompt.includes("RESPONSE CONTRACT:");
 
   const status =
     actual === expected.responseMode && hasInstruction ? "PASS" : "FAIL";
