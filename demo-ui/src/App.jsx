@@ -11,8 +11,11 @@ export default function App() {
     responseMode,
   });
 
+  const optimizedPrompt =
+    result.clarify || result.finalPrompt || result.compressedPrompt || "";
+
   const beforeTokens = estimateTokens(rawPrompt);
-  const afterTokens = estimateTokens(result.compressedPrompt || "");
+  const afterTokens = estimateTokens(optimizedPrompt);
   const tokenDelta = beforeTokens - afterTokens;
 
   return (
@@ -55,9 +58,12 @@ export default function App() {
                 </option>
               ))}
             </select>
+
+            <p className="meta">
+              Estimated tokens: {beforeTokens}
+            </p>
           </div>
 
-          <p className="meta">Estimated tokens: {beforeTokens}</p>
         </div>
 
         <div className="card">
@@ -65,51 +71,51 @@ export default function App() {
 
           <textarea
             readOnly
-            value={result.clarify || result.compressedPrompt}
+            value={optimizedPrompt}
             placeholder="Optimized prompt will appear here..."
           />
 
           <div className="details">
-            {result.responseMode?.displayName && (
-              <p>
+            <div className="details-row">
+              <span>
                 <strong>Selected Mode:</strong>{" "}
-                {result.responseMode.displayName}
-              </p>
+                {result.responseMode?.displayName || "Default"}
+              </span>
+
+              {result.formatRule && (
+                <span>
+                  <strong>Format Rule:</strong> {result.formatRule}
+                </span>
+              )}
+            </div>
+
+            <div className="details-row">
+              <span>
+                <strong>Type:</strong> {result.type}
+              </span>
+
+              <span>
+                <strong>Complex:</strong> {result.complex ? "Yes" : "No"}
+              </span>
+            </div>
+
+            {result.responseMode?.displayName && (
+              <div className="details-row">
+                <span>
+                  <strong>Notes:</strong> {result.responseMode.displayName} applied
+                </span>
+              </div>
             )}
 
-            {result.formatRule && (
-              <p>
-                <strong>Format Rule:</strong> {result.formatRule}
-              </p>
-            )}
-
-            <p>
-              <strong>Type:</strong> {result.type}
-            </p>
-
-            <p>
-              <strong>Complex:</strong> {result.complex ? "Yes" : "No"}
-            </p>
-
-            {result.clarify && (
-              <p>
-                <strong>Clarify:</strong> {result.clarify}
-              </p>
-            )}
-
-            {result.notes?.length > 0 && (
-              <p>
-                <strong>Notes:</strong> {result.notes.join(", ")}
-              </p>
-            )}
-
-            <p>
-              <strong>Token Estimate:</strong> {beforeTokens} → {afterTokens}
-              {rawPrompt &&
-                ` (${tokenDelta >= 0 ? "-" : "+"}${Math.abs(
-                  tokenDelta
-                )} tokens)`}
-            </p>
+            <div className="details-row">
+              <span>
+                <strong>Token Estimate:</strong> {beforeTokens} → {afterTokens}
+                {rawPrompt &&
+                  ` (${tokenDelta >= 0 ? "-" : "+"}${Math.abs(
+                    tokenDelta
+                  )} tokens)`}
+              </span>
+            </div>
           </div>
         </div>
       </section>
