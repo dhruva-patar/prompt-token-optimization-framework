@@ -3,7 +3,9 @@ import { classifyPrompt } from "./classification/classifyPrompt.js";
 import { detectTypeSignals } from "./classification/detectTypeSignals.js";
 import { detectComplexity } from "./complexity/detectComplexity.js";
 import { needsClarification } from "./clarification/needsClarification.js";
-
+import { runLongPromptStructurer } from "./structure/longPromptStructurer.js";
+import { blendFormats } from "./formatting/blendFormats.js";
+import { applyResponseMode } from "./responseModes/applyResponseMode.js";
 
 function estimateTokens(text) {
   if (!text || !text.trim()) return 0;
@@ -13,22 +15,8 @@ function estimateTokens(text) {
 function stripFiller(text) {
   return text
     .replace(/\b(please|could you|can you help me|can you|i want to know|i was wondering)\b/gi, "")
-    .replace(/\s+/g, " ")
+    .replace(/[ \t]+/g, " ")
     .trim();
-}
-
-function getDefaultFormat(type) {
-  const formats = {
-    Informational: "Use max 7 bullets.",
-    Decision: "Give max 3 options with 1 trade-off line each.",
-    Comparative: "Use 2-column comparison, max 5 rows.",
-    Creative: "Give 2 variants only.",
-    Strategic: "Use max 3 sections.",
-    Technical: "Use numbered steps only.",
-    Analytical: "Give max 3 findings with 1 impact line each.",
-  };
-
-  return formats[type] || formats.Informational;
 }
 
 function compressBasic(text) {
@@ -37,11 +25,13 @@ function compressBasic(text) {
     .replace(/\bcompare it with\b/gi, "vs")
     .replace(/\bsuggest one for\b/gi, "Recommend one for")
     .replace(/\ba customer support chat function\b/gi, "customer support chat")
-    .replace(/\s+/g, " ")
+    .replace(/[ \t]+/g, " ")
     .trim();
 }
 
-export function optimizePrompt(userPrompt) {
+export function optimizePrompt(userPrompt, options = {}) {
+  const responseModeOption = options.responseMode || "default";
+
   if (!userPrompt || !userPrompt.trim()) {
     return {
       compressedPrompt: "",
@@ -52,19 +42,24 @@ export function optimizePrompt(userPrompt) {
       clarify: "",
       shortPrompt: false,
       tokenCount: 0,
+      responseMode: {
+        key: "default",
+        displayName: "Default",
+        instruction: "",
+      },
     };
   }
 
   const tokenCount = estimateTokens(userPrompt);
   const shortPrompt = tokenCount < 15;
 
-  let type = classifyPrompt(userPrompt); 
-  
+  const type = classifyPrompt(userPrompt);
+
   const stripped = shortPrompt ? userPrompt.trim() : stripFiller(userPrompt);
-  
+
   const typeSignals = detectTypeSignals(userPrompt);
   const uniqueTypes = [...new Set(typeSignals.map((signal) => signal.type))];
-  
+
   const complex = uniqueTypes.length > 1 || detectComplexity(stripped);
 
   if (needsClarification(userPrompt, type)) {
@@ -76,34 +71,49 @@ export function optimizePrompt(userPrompt) {
       clarify: "Please share the missing input so I can analyze it accurately.",
       shortPrompt,
       tokenCount,
+      formatRule: blendFormats(type, typeSignals, complex),
     };
   }
 
-  const formatRule = getDefaultFormat(type);
+  const formatRule = blendFormats(type, typeSignals, complex);
 
   const cleanStripped = stripped.replace(/[?.!]+$/, "");
-  //const compressedCore = compressBasic(cleanStripped);
-  
-  const pipelineResult = runCompressionPipeline(compressBasic(cleanStripped));
+  const structureResult = runLongPromptStructurer(cleanStripped);
+
+  const pipelineResult = runCompressionPipeline(
+    compressBasic(structureResult.structuredText)
+  );
+
   const compressedCore = pipelineResult.compressedText;
-  
-  const compressedPrompt = `${compressedCore}.`; 
-  
+
+  const baseCompressedPrompt = `${compressedCore}.`;
+
+  const responseModeResult = applyResponseMode(
+    baseCompressedPrompt,
+    responseModeOption
+  );
 
   return {
-    compressedPrompt,
+    compressedPrompt: baseCompressedPrompt,
+    finalPrompt: responseModeResult.finalPrompt,
+    responseEnhancementBlock: responseModeResult.enhancementBlock,
     type,
     complex,
     notes: [
       ...(shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : []),
+      ...structureResult.structureNotes,
       ...pipelineResult.compressionNotes,
+      ...(responseModeResult.applied
+        ? [`Applied response mode: ${responseModeResult.responseMode.displayName}`]
+        : []),
     ],
     clarify: "",
     shortPrompt,
     tokenCount,
     formatRule,
+    responseMode: responseModeResult.responseMode,
   };
 }
 
-export { estimateTokens};
+export { estimateTokens };
 export default optimizePrompt;

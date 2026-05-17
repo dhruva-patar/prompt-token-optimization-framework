@@ -8,6 +8,7 @@
     "test": "node test/testHarness.js",
     "complex": "node test/complexHarness.js",
     "benchmark": "node test/benchmarkSuite.js",
+    "benchmark:large": "node test/largeBenchmarkSuite.js",
     "ptof": "node cli/ptof-cli.js"
   },
   "keywords": [

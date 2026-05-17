@@ -474,3 +474,120 @@ The project intentionally prioritizes:
 # License
 
 MIT
+
+
+---
+
+# Response Behavior Contracts
+
+PTOF now supports deterministic response behavior presets that shape downstream LLM outputs without modifying semantic intent.
+
+Examples:
+- Thesis mode
+- Challenge my views
+- Simplify all
+- Action plan
+- ELI10
+- Risk analysis
+
+Example:
+
+```text
+Should we build this startup?
+```
+
+Final LLM-ready prompt:
+
+```text
+Should we build this startup?
+
+RESPONSE CONTRACT:
+- Challenge assumptions and identify weaknesses.
+```
+
+This creates:
+- controllable downstream behavior
+- inspectable response shaping
+- deterministic output contracts
+- reusable optimization presets
+
+---
+
+# Final Prompt Rendering
+
+PTOF separates:
+
+```text
+compressedPrompt
+```
+
+from:
+
+```text
+finalPrompt
+```
+
+This architecture improves:
+- explainability
+- benchmarkability
+- semantic inspection
+- middleware compatibility
+- enterprise auditability
+
+Pipeline:
+
+```text
+User Prompt
+↓
+Optimization
+↓
+Response Contract
+↓
+Final LLM-ready Prompt
+```
+
+---
+
+# Current Benchmark Status
+
+Current benchmark categories include:
+- type accuracy
+- semantic safety
+- instruction retention
+- clarification validation
+- response mode accuracy
+- token efficiency
+- long prompt structuring
+
+Current benchmark status:
+
+```text
+PASS: 19
+WARN: 0
+FAIL: 0
+```
+
+---
+
+# Updated Product Positioning
+
+PTOF is evolving into:
+
+```text
+Deterministic prompt optimization middleware for LLM systems.
+```
+
+NOT:
+- a black-box rewriting engine
+- an AI paraphrasing system
+- a probabilistic optimizer
+
+The project prioritizes:
+- deterministic behavior
+- semantic preservation
+- explainable transformations
+- benchmark-driven reliability
+- enterprise-safe preprocessing
+
+---
+

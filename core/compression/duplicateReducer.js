@@ -1,5 +1,8 @@
 function normalizeWhitespace(text) {
-  return text.replace(/\s+/g, " ").trim();
+  return text
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 const REPEATED_INTENT_PATTERNS = [
@@ -49,7 +52,13 @@ function reduceRepeatedIntentVerbs(text) {
   return result;
 }
 
+
+
 function removeDuplicateSentences(text) {
+  if (/^[A-Z /]+:/m.test(text)) {
+    return text;
+  }
+
   const sentenceParts = text
     .split(/(?<=[.!?])\s+/)
     .map((sentence) => sentence.trim())
@@ -66,6 +75,17 @@ function removeDuplicateSentences(text) {
       uniqueSentences.push(sentence);
     }
   });
+
+  if (sentenceParts.length === 0) {
+    return text;
+  }
+
+  const reductionRatio =
+    uniqueSentences.length / sentenceParts.length;
+
+  if (reductionRatio < 0.6) {
+    return text;
+  }
 
   return uniqueSentences.join(" ");
 }
