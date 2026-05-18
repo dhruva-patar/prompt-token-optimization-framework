@@ -3,6 +3,12 @@ import { optimizePrompt, estimateTokens } from "../../core/optimizer.js";
 import { RESPONSE_MODE_OPTIONS } from "../../core/responseModes/responseModeMap.js";
 import "./App.css";
 
+const EXAMPLE_PROMPTS = [
+  "Analyze whether this SaaS idea is viable for solo founders.",
+  "Explain Kubernetes networking to a beginner.",
+  "Challenge my assumptions about building an AI startup.",
+];
+
 export default function App() {
   const [rawPrompt, setRawPrompt] = useState("");
   const [responseMode, setResponseMode] = useState("default");
@@ -17,6 +23,16 @@ export default function App() {
   const beforeTokens = estimateTokens(rawPrompt);
   const afterTokens = estimateTokens(optimizedPrompt);
   const tokenDelta = beforeTokens - afterTokens;
+
+  const handleCopy = async () => {
+  try {
+    await navigator.clipboard.writeText(
+      optimizedPrompt
+    );
+  } catch (err) {
+    console.error("Copy failed", err);
+  }
+};
 
   return (
     <main className="app">
@@ -36,7 +52,34 @@ export default function App() {
 
       <section className="grid">
         <div className="card">
-          <h2>Raw Prompt</h2>
+          
+          <div className="card-header">
+            <h2>Raw Prompt</h2>
+            
+
+            <button
+              className="clear-button"
+              onClick={() => setRawPrompt("")}
+            >
+              Clear
+            </button>
+          </div>
+
+          <p className="example-label">
+            Try it out:
+          </p>
+ 
+        <div className="example-prompts">
+          {EXAMPLE_PROMPTS.map((prompt) => (
+            <button
+              key={prompt}
+              className="example-chip"
+              onClick={() => setRawPrompt(prompt)}
+            >
+              {prompt}
+            </button>
+          ))}
+        </div>
 
           <textarea
             value={rawPrompt}
@@ -63,12 +106,19 @@ export default function App() {
               Estimated tokens: {beforeTokens}
             </p>
           </div>
-
         </div>
-
+        
         <div className="card">
-          <h2>Optimized Prompt</h2>
+          <div className="card-header">
+            <h2>Optimized Prompt</h2>
 
+            <button
+              className="copy-button"
+              onClick={handleCopy}
+            >
+              Copy
+            </button>
+          </div>
           <textarea
             readOnly
             value={optimizedPrompt}
