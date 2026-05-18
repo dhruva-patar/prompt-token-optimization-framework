@@ -3,10 +3,11 @@ import { RESPONSE_MODE_MAP } from "./responseModeMap.js";
 export function getResponseModeInstruction(responseMode = "default") {
   const mode = RESPONSE_MODE_MAP[responseMode] || RESPONSE_MODE_MAP.default;
 
-  return {
+ return {
     key: mode.key,
     displayName: mode.displayName,
     category: mode.category,
+    communityMacro: mode.communityMacro || "",
     instruction: mode.instruction || "",
-  };
+  }; 
 }
