@@ -15,10 +15,16 @@ export default function evaluateResponseModeAccuracy(result, expected) {
     result.optimized ||
     "";
 
+  const expectedMacro =
+    result.raw?.responseMode?.communityMacro ||
+    result.raw?.responseMode?.instruction ||
+    "";
+
   const hasInstruction =
     typeof finalPrompt === "string" &&
-    finalPrompt.includes("RESPONSE CONTRACT:");
-
+    expectedMacro &&
+    finalPrompt.includes(`@${expectedMacro}`);
+  
   const status =
     actual === expected.responseMode && hasInstruction ? "PASS" : "FAIL";
 

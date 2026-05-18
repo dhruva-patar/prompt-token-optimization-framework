@@ -3,7 +3,9 @@ import { getResponseModeInstruction } from "./getResponseModeInstruction.js";
 export function applyResponseMode(prompt, responseMode = "default") {
   const mode = getResponseModeInstruction(responseMode);
 
-  if (!mode.instruction) {
+  const contractInstruction = mode.communityMacro || mode.instruction;
+
+  if (!contractInstruction){
     return {
       finalPrompt: prompt,
       responseMode: mode,
@@ -12,7 +14,7 @@ export function applyResponseMode(prompt, responseMode = "default") {
     };
   }
 
-  const enhancementBlock = `RESPONSE CONTRACT:\n- ${mode.instruction}`;
+  const enhancementBlock = `\n@${contractInstruction}`;
 
   return {
     finalPrompt: `${prompt}\n\n${enhancementBlock}`,
