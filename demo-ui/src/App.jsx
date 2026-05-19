@@ -13,6 +13,8 @@ export default function App() {
   const [rawPrompt, setRawPrompt] = useState("");
   const [responseMode, setResponseMode] = useState("default");
 
+  const [copied, setCopied] = useState(false);
+
   const result = optimizePrompt(rawPrompt, {
     responseMode,
   });
@@ -24,7 +26,7 @@ export default function App() {
   const afterTokens = estimateTokens(optimizedPrompt);
   const tokenDelta = beforeTokens - afterTokens;
 
-  const handleCopy = async () => {
+  /*const handleCopy = async () => {
   try {
     await navigator.clipboard.writeText(
       optimizedPrompt
@@ -32,7 +34,24 @@ export default function App() {
   } catch (err) {
     console.error("Copy failed", err);
   }
-};
+  };*/
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(
+        optimizedPrompt
+      );
+
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 1600);
+
+    } catch (err) {
+      console.error("Copy failed", err);
+    }
+  };
 
   return (
     <main className="app">
@@ -82,9 +101,11 @@ export default function App() {
         </div>
 
           <textarea
-            value={rawPrompt}
-            onChange={(e) => setRawPrompt(e.target.value)}
-            placeholder="Enter your prompt..."
+            className={!rawPrompt ? "empty-state" : ""}
+            value={
+              rawPrompt ||
+              "Start typing..."
+            }
           />
 
           <div className="response-mode-wrapper">
@@ -116,13 +137,15 @@ export default function App() {
               className="copy-button"
               onClick={handleCopy}
             >
-              Copy
+              {copied ? "Copied" : "Copy"}
             </button>
           </div>
           <textarea
-            readOnly
-            value={optimizedPrompt}
-            placeholder="Optimized prompt will appear here..."
+            value={
+              optimizedPrompt ||
+              "PTOF will optimize and structure your prompt here."
+            }
+            className={!optimizedPrompt ? "empty-state" : ""}
           />
 
           <div className="details">
