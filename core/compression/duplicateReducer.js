@@ -52,23 +52,34 @@ function reduceRepeatedIntentVerbs(text) {
   return result;
 }
 
-
-
 function removeDuplicateSentences(text) {
   if (/^[A-Z /]+:/m.test(text)) {
     return text;
   }
 
-  const sentenceParts = text
+  const normalizedBoundaries = text.replace(
+    /([.!?])(?=[A-Z])/g,
+    "$1 "
+  );
+
+  const sentenceParts = normalizedBoundaries
     .split(/(?<=[.!?])\s+/)
     .map((sentence) => sentence.trim())
     .filter(Boolean);
+
+  if (sentenceParts.length === 0) {
+    return text;
+  }
 
   const seen = new Set();
   const uniqueSentences = [];
 
   sentenceParts.forEach((sentence) => {
-    const normalized = sentence.toLowerCase().replace(/[^\w\s]/g, "").trim();
+    const normalized = sentence
+      .toLowerCase()
+      .replace(/[^\w\s]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
 
     if (!seen.has(normalized)) {
       seen.add(normalized);
@@ -76,14 +87,32 @@ function removeDuplicateSentences(text) {
     }
   });
 
-  if (sentenceParts.length === 0) {
-    return text;
-  }
-
   const reductionRatio =
     uniqueSentences.length / sentenceParts.length;
 
   if (reductionRatio < 0.6) {
+    const originalNormalized = sentenceParts.map((sentence) =>
+      sentence
+        .toLowerCase()
+        .replace(/[^\w\s]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+
+    const dominantSentenceCount = Math.max(
+      ...[...new Set(originalNormalized)].map(
+        (sentence) =>
+          originalNormalized.filter((item) => item === sentence).length
+      )
+    );
+
+    const dominantRatio =
+      dominantSentenceCount / sentenceParts.length;
+
+    if (dominantRatio >= 0.8) {
+      return uniqueSentences.join(" ");
+    }
+
     return text;
   }
 

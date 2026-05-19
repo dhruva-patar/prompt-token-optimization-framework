@@ -77,7 +77,10 @@ export function optimizePrompt(userPrompt, options = {}) {
 
   const formatRule = blendFormats(type, typeSignals, complex);
 
-  const cleanStripped = stripped.replace(/[?.!]+$/, "");
+  const cleanStripped = stripped
+    .replace(/[?.!]+$/, "")
+    .replace(/([.!?])(?=[A-Z])/g, "$1 ");
+
   const structureResult = runLongPromptStructurer(cleanStripped);
 
   const pipelineResult = runCompressionPipeline(

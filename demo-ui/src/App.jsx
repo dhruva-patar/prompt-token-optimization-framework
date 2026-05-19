@@ -26,16 +26,7 @@ export default function App() {
   const afterTokens = estimateTokens(optimizedPrompt);
   const tokenDelta = beforeTokens - afterTokens;
 
-  /*const handleCopy = async () => {
-  try {
-    await navigator.clipboard.writeText(
-      optimizedPrompt
-    );
-  } catch (err) {
-    console.error("Copy failed", err);
-  }
-  };*/
-
+  
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(
@@ -102,10 +93,9 @@ export default function App() {
 
           <textarea
             className={!rawPrompt ? "empty-state" : ""}
-            value={
-              rawPrompt ||
-              "Start typing..."
-            }
+            value={rawPrompt}
+            onChange={(e) => setRawPrompt(e.target.value)}
+            placeholder="Start typing..."
           />
 
           <div className="response-mode-wrapper">
