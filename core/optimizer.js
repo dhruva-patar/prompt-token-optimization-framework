@@ -22,10 +22,16 @@ function stripFiller(text) {
 function compressBasic(text) {
   return text
     .replace(/\bwhat is\b/gi, "Explain")
+    .replace(/\band list out\b/gi, "List")
+    .replace(/\blist out\b/gi, "List")
+    .replace(/\bfor my startup\b/gi, "for the startup")
     .replace(/\bcompare it with\b/gi, "vs")
     .replace(/\bsuggest one for\b/gi, "Recommend one for")
     .replace(/\ba customer support chat function\b/gi, "customer support chat")
     .replace(/[ \t]+/g, " ")
+    .replace(/\bso on and so forth\b/gi, "")
+    .replace(/\btell me about about\b/gi, "Tell me about")
+    .replace(/\band list out\b/gi, "List")
     .trim();
 }
 
@@ -81,13 +87,32 @@ export function optimizePrompt(userPrompt, options = {}) {
     .replace(/[?.!]+$/, "")
     .replace(/([.!?])(?=[A-Z])/g, "$1 ");
 
+/*const structureResult = runLongPromptStructurer(cleanStripped);
+  
+  const pipelineResult = runCompressionPipeline(
+    compressBasic(structureResult.structuredText)
+  );
+
+  const compressedCore = pipelineResult.compressedText;*/
+
+  console.log("CLEAN STRIPPED:", cleanStripped);
   const structureResult = runLongPromptStructurer(cleanStripped);
+
+  console.log(
+    "AFTER STRUCTURE:",
+    structureResult.structuredText
+  );
 
   const pipelineResult = runCompressionPipeline(
     compressBasic(structureResult.structuredText)
   );
 
   const compressedCore = pipelineResult.compressedText;
+
+  console.log(
+    "AFTER COMPRESSION:",
+    compressedCore
+  );
 
   const baseCompressedPrompt = `${compressedCore}.`;
 

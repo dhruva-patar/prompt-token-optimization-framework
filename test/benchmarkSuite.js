@@ -3,8 +3,9 @@ import path from "path";
 
 import benchmarkCases from "./benchmarkCases.js";
 import noisyPrompts from "./benchmarkCases/noisyPrompts.js";
-//import longPromptStructuringCases from "./benchmarkCases/longPromptStructuring.js";
 import responseModeCases from "./benchmarkCases/responseModeCases.js";
+
+import { semanticPreservationCases } from "./benchmarkCases/semanticPreservationCases.js";
 
 import evaluateInstructionRetention from "./evaluators/instructionRetention.js";
 import evaluateSemanticRisk from "./evaluators/semanticRisk.js";
@@ -21,7 +22,7 @@ import evaluateResponseModeAccuracy from "./evaluators/responseModeAccuracy.js";
 const allBenchmarks = [
   ...benchmarkCases,
   ...noisyPrompts,
- // ...longPromptStructuringCases,
+  ...semanticPreservationCases,
   ...responseModeCases,
 ];
 
