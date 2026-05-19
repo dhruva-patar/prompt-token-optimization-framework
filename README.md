@@ -48,6 +48,38 @@ The framework acts as a preprocessing layer between user input and an LLM.
 
 Instead of replacing prompts with probabilistic rewrites, PTOF focuses on deterministic preprocessing infrastructure.
 
+
+### Short Prompt Handling (v0.9 Evolution)
+
+Original PTOF versions fully bypassed classification and complexity analysis for prompts under 15 tokens.
+
+During real-world testing, this created incorrect behavior for short but semantically obvious prompts such as:
+
+- "Should we build this?"
+- "Debug this error"
+- "Compare React vs Vue"
+
+The framework now applies:
+- lightweight classification
+- lightweight response shaping
+
+while still bypassing:
+- aggressive stripping
+- structural compression
+- heavy logic-gate processing
+
+This preserves the original low-overhead philosophy while improving practical usability and output accuracy.
+
+Current behavior:
+
+```text
+IF token_count(user_prompt) < 15
+  → skip structural optimization layers
+  → still run lightweight classification
+  → apply minimal deterministic formatting
+  → flag: short_prompt = TRUE
+```
+
 ---
 
 # Core Philosophy
@@ -124,6 +156,24 @@ Detected as:
 
 ```text
 Comparative complex
+```
+
+
+### Complexity Detection Notes
+
+PTOF intentionally uses conservative complexity detection.
+
+A prompt may be marked as complex when:
+- multiple strong intent families exist
+- conjunction chains are detected
+- competing directives are present
+
+This behavior evolved from real-world semantic preservation testing, especially for multi-intent prompts where aggressive simplification risked intent loss.
+
+The framework currently prioritizes:
+
+```text
+semantic preservation > aggressive simplification
 ```
 
 ---
@@ -562,7 +612,7 @@ Current benchmark categories include:
 Current benchmark status:
 
 ```text
-PASS: 19
+PASS: 20
 WARN: 0
 FAIL: 0
 ```
