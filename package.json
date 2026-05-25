@@ -5,11 +5,13 @@
   "description": "Deterministic prompt optimization middleware for LLM inference preprocessing",
   "main": "core/optimizer.js",
   "scripts": {
-    "test": "node test/testHarness.js",
-    "complex": "node test/complexHarness.js",
-    "benchmark": "node test/benchmarkSuite.js",
-    "benchmark:large": "node test/largeBenchmarkSuite.js",
-    "ptof": "node cli/ptof-cli.js"
+    "test": "node benchmark/testHarness.js",
+    "complex": "node benchmark/complexHarness.js",
+    "benchmark": "node benchmark/benchmarkSuite.js",
+    "benchmark:large": "node benchmark/largeBenchmarkSuite.js",
+    "contract": "node benchmark/algorithmContractSuite.js",
+    "ptof": "node cli/ptof-cli.js",
+    "api": "node api/server.js"
   },
   "keywords": [
     "prompt-engineering",
@@ -20,5 +22,8 @@
     "prompt-optimization"
   ],
   "author": "Dhruva Patar",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }

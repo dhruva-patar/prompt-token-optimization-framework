@@ -489,7 +489,7 @@ cli/
 
 demo-ui/
 
-test/
+benchmark/
  ├── benchmarkCases/
  ├── evaluators/
  └── results/

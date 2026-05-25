@@ -1,28 +1,20 @@
-export function needsClarification(text, type) {
-  const lower = (text || "").toLowerCase();
+export function needsClarification(prompt, type) {
+  const text = prompt.toLowerCase();
 
-  const referencesMissingInput =
-    /\b(this|uploaded|attached)\b/i.test(lower);
+  if (type === "Analytical") {
+    const hasVagueReference =
+      /\b(this|it|these|that|above|attached|uploaded|shared)\b/.test(text);
 
-  const referencesFileOrData =
-    /\b(file|csv|spreadsheet|dataset|metrics)\b/i.test(lower);
+    const referencesExternalInput =
+      /\b(uploaded|attached|file|document|sheet|spreadsheet|csv|pdf|report)\b/.test(text);
 
-  const referencesCodeArtifact =
-    /\b(component|code|file)\b/i.test(lower);
+    const hasConcreteData =
+      /\d/.test(text) ||
+      /\b(table|rows|columns|dataset|json|csv data|metrics:|results:|logs:)\b/.test(text);
 
-  const marketResearchSignals =
-    /\b(trends|industry|market|country|sector|growth|consumer|startup|economy)\b/i.test(lower);
-
-  if (marketResearchSignals) {
-    return false;
-  }
-
-  if (type === "Analytical" && referencesMissingInput && referencesFileOrData) {
-    return true;
-  }
-
-  if (type === "Technical" && referencesMissingInput && referencesCodeArtifact) {
-    return true;
+    if ((hasVagueReference || referencesExternalInput) && !hasConcreteData) {
+      return true;
+    }
   }
 
   return false;
