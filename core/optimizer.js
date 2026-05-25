@@ -87,6 +87,10 @@ export function optimizePrompt(userPrompt, options = {}) {
     .replace(/[?.!]+$/, "")
     .replace(/([.!?])(?=[A-Z])/g, "$1 ");
 
+  const structureResult = shortPrompt
+    ? { structuredText: cleanStripped, structureNotes: [] }
+    : runLongPromptStructurer(cleanStripped);
+  
   const pipelineResult = runCompressionPipeline(
     compressBasic(structureResult.structuredText)
   );
