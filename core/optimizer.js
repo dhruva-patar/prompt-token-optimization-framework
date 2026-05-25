@@ -87,32 +87,15 @@ export function optimizePrompt(userPrompt, options = {}) {
     .replace(/[?.!]+$/, "")
     .replace(/([.!?])(?=[A-Z])/g, "$1 ");
 
-/*const structureResult = runLongPromptStructurer(cleanStripped);
+  const structureResult = shortPrompt
+    ? { structuredText: cleanStripped, structureNotes: [] }
+    : runLongPromptStructurer(cleanStripped);
   
   const pipelineResult = runCompressionPipeline(
     compressBasic(structureResult.structuredText)
   );
 
-  const compressedCore = pipelineResult.compressedText;*/
-
-  console.log("CLEAN STRIPPED:", cleanStripped);
-  const structureResult = runLongPromptStructurer(cleanStripped);
-
-  console.log(
-    "AFTER STRUCTURE:",
-    structureResult.structuredText
-  );
-
-  const pipelineResult = runCompressionPipeline(
-    compressBasic(structureResult.structuredText)
-  );
-
   const compressedCore = pipelineResult.compressedText;
-
-  console.log(
-    "AFTER COMPRESSION:",
-    compressedCore
-  );
 
   const baseCompressedPrompt = `${compressedCore}.`;
 
@@ -128,7 +111,7 @@ export function optimizePrompt(userPrompt, options = {}) {
     type,
     complex,
     notes: [
-      ...(shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : []),
+      ...(shortPrompt ? ["Short prompt — heavy optimization bypassed"] : []),
       ...structureResult.structureNotes,
       ...pipelineResult.compressionNotes,
       ...(responseModeResult.applied
