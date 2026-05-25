@@ -87,32 +87,11 @@ export function optimizePrompt(userPrompt, options = {}) {
     .replace(/[?.!]+$/, "")
     .replace(/([.!?])(?=[A-Z])/g, "$1 ");
 
-/*const structureResult = runLongPromptStructurer(cleanStripped);
-  
-  const pipelineResult = runCompressionPipeline(
-    compressBasic(structureResult.structuredText)
-  );
-
-  const compressedCore = pipelineResult.compressedText;*/
-
-  console.log("CLEAN STRIPPED:", cleanStripped);
-  const structureResult = runLongPromptStructurer(cleanStripped);
-
-  console.log(
-    "AFTER STRUCTURE:",
-    structureResult.structuredText
-  );
-
   const pipelineResult = runCompressionPipeline(
     compressBasic(structureResult.structuredText)
   );
 
   const compressedCore = pipelineResult.compressedText;
-
-  console.log(
-    "AFTER COMPRESSION:",
-    compressedCore
-  );
 
   const baseCompressedPrompt = `${compressedCore}.`;
 
