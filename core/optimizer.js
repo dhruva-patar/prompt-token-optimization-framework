@@ -107,7 +107,7 @@ export function optimizePrompt(userPrompt, options = {}) {
     type,
     complex,
     notes: [
-      ...(shortPrompt ? ["Short prompt — Steps 1–3 bypassed"] : []),
+      ...(shortPrompt ? ["Short prompt — heavy optimization bypassed"] : []),
       ...structureResult.structureNotes,
       ...pipelineResult.compressionNotes,
       ...(responseModeResult.applied
