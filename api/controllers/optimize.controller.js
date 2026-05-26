@@ -1,4 +1,5 @@
 import { optimizePrompt } from "../../core/optimizer.js";
+import { sendSuccess } from "../utils/sendResponse.js";
 
 export function optimizeController(req, res, next) {
   try {
@@ -6,10 +7,7 @@ export function optimizeController(req, res, next) {
 
     const result = optimizePrompt(prompt, options || {});
 
-    return res.json({
-      success: true,
-      result,
-    });
+    return sendSuccess(res, result);
   } catch (error) {
     next(error);
   }

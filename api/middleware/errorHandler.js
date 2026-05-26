@@ -1,8 +1,11 @@
+import { sendError } from "../utils/sendResponse.js";
+
 export function errorHandler(err, req, res, next) {
   console.error(err);
 
-  return res.status(err.status || 500).json({
-    success: false,
-    error: err.message || "Internal Server Error",
-  });
+  return sendError(
+    res,
+    err.message || "Internal Server Error",
+    err.status || 500
+  );
 }

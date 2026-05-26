@@ -1,5 +1,6 @@
 import { classifyPrompt } from "../../core/classification/classifyPrompt.js";
 import { detectTypeSignals } from "../../core/classification/detectTypeSignals.js";
+import { sendSuccess } from "../utils/sendResponse.js";
 
 export function classifyController(req, res, next) {
   try {
@@ -8,12 +9,9 @@ export function classifyController(req, res, next) {
     const type = classifyPrompt(prompt);
     const typeSignals = detectTypeSignals(prompt);
 
-    return res.json({
-      success: true,
-      result: {
-        type,
-        signals: typeSignals,
-      },
+    return sendSuccess(res, {
+      type,
+      signals: typeSignals,
     });
   } catch (error) {
     next(error);

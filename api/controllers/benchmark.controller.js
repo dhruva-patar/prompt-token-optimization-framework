@@ -1,4 +1,5 @@
 import { runBenchmarkSuite } from "../../benchmark/runBenchmarkSuite.js";
+import { sendSuccess } from "../utils/sendResponse.js";
 
 export function benchmarkController(req, res, next) {
   try {
@@ -6,10 +7,7 @@ export function benchmarkController(req, res, next) {
 
     const result = runBenchmarkSuite({ includeCases });
 
-    return res.json({
-      success: true,
-      result,
-    });
+    return sendSuccess(res, result);
   } catch (error) {
     next(error);
   }
