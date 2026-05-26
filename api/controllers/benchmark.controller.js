@@ -1,6 +1,6 @@
 import { runBenchmarkSuite } from "../../benchmark/runBenchmarkSuite.js";
 
-export function benchmarkController(req, res) {
+export function benchmarkController(req, res, next) {
   try {
     const { includeCases = false } = req.body || {};
 
@@ -11,9 +11,6 @@ export function benchmarkController(req, res) {
       result,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    next(error);
   }
 }

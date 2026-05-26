@@ -27,4 +27,4 @@ if (result.notes && result.notes.length) {
   console.log("NOTE:");
   result.notes.forEach((note) => console.log(note));
 }
-<p><strong>Format:</strong> {result.formatRule}</p>
+//><strong>Format:</strong> {result.formatRule}</p>

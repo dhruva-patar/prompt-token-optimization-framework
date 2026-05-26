@@ -1,16 +1,9 @@
 import { optimizePrompt } from "../../core/optimizer.js";
 
-export function optimizeController(req, res) {
-  const { prompt, options } = req.body;
-
-  if (!prompt) {
-    return res.status(400).json({
-      success: false,
-      error: "Prompt is required",
-    });
-  }
-
+export function optimizeController(req, res, next) {
   try {
+    const { prompt, options } = req.body;
+
     const result = optimizePrompt(prompt, options || {});
 
     return res.json({
@@ -18,9 +11,6 @@ export function optimizeController(req, res) {
       result,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    next(error);
   }
 }
