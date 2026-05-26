@@ -5,6 +5,7 @@ export function errorHandler(err, req, res, next) {
 
   return sendError(
     res,
+    req,
     err.message || "Internal Server Error",
     err.status || 500
   );

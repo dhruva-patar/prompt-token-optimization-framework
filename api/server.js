@@ -3,13 +3,16 @@ import optimizeRoutes from "./v1/routes/optimize.routes.js";
 import classifyRoutes from "./v1/routes/classify.routes.js";
 import benchmarkRoutes from "./v1/routes/benchmark.routes.js";
 import { requestLogger } from "./middleware/requestLogger.js";
-
+import { requestTimer } from "./middleware/requestTimer.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
 app.use(requestLogger);
+app.use(requestTimer);
+
 app.use("/v1/optimize", optimizeRoutes);
 app.use("/v1/classify", classifyRoutes);
 app.use("/v1/benchmark", benchmarkRoutes);

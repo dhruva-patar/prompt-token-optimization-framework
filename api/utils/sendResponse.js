@@ -1,15 +1,37 @@
-export function sendSuccess(res, result, meta = {}) {
+export function sendSuccess(res, req, result, meta = {}) {
+  const durationMs = Date.now() - req.startTime;
+
   return res.json({
     success: true,
     result,
-    meta,
+    meta: {
+      version: "v1",
+      timestamp: new Date().toISOString(),
+      durationMs,
+      ...meta,
+    },
   });
 }
 
-export function sendError(res, message, statusCode = 500, meta = {}) {
+export function sendError(
+  res,
+  req,
+  message,
+  statusCode = 500,
+  meta = {}
+) {
+  const durationMs = req?.startTime
+    ? Date.now() - req.startTime
+    : null;
+
   return res.status(statusCode).json({
     success: false,
     error: message,
-    meta,
+    meta: {
+      version: "v1",
+      timestamp: new Date().toISOString(),
+      durationMs,
+      ...meta,
+    },
   });
 }
