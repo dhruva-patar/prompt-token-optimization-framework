@@ -8,7 +8,8 @@ async function run() {
     prompt: "Compare GPT and Claude for code review.",
   });
 
+  console.log("Provider result:");
   console.log(result);
 }
 
-run();
+run().catch(console.error);
