@@ -1,7 +1,7 @@
 import PTOFClient from "./client.js";
 
 const client = new PTOFClient({
-    baseUrl: "http://localhost:3000/v1",
+    baseUrl: "http://127.0.0.1:3000/v1",
 
 });
 
