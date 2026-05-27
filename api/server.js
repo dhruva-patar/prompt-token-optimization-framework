@@ -4,9 +4,10 @@ import classifyRoutes from "./v1/routes/classify.routes.js";
 import benchmarkRoutes from "./v1/routes/benchmark.routes.js";
 import { requestLogger } from "./middleware/requestLogger.js";
 import { requestTimer } from "./middleware/requestTimer.js";
+import { env } from "../config/env.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = env.port;
 
 app.use(express.json());
 
