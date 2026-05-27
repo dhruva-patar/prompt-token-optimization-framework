@@ -1,8 +1,10 @@
 import { normalizeProviderResponse } from "../../shared/provider.interface.js";
 
+import { env } from "../../../config/env.js";
+
 export async function runOpenAIProvider({
   prompt,
-  model = "gpt-4.1-mini",
+  model = env.openai.defaultModel,
   raw = null,
 } = {}) {
   const start = Date.now();

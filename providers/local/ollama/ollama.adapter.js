@@ -1,8 +1,10 @@
 import { normalizeProviderResponse } from "../../shared/provider.interface.js";
 
+import { env } from "../../../config/env.js";
+
 export async function runOllamaProvider({
   prompt,
-  model = "llama3.1",
+  model = env.ollama.defaultModel,
   raw = null,
 } = {}) {
   const start = Date.now();
