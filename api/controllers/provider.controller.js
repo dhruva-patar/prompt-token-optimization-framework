@@ -15,21 +15,39 @@ export async function runProviderController(req, res) {
   if (optimizationResult.clarify) {
     return sendSuccess(res, req, {
       optimization: optimizationResult,
-      provider: null,
+      provider: {
+        status: "skipped",
+        reason: "clarification_required",
+      },
     });
   }
 
-  const providerResult = await runProvider({
-    provider,
-    model,
-    prompt: optimizationResult.finalPrompt || optimizationResult.compressedPrompt,
-    raw: {
-      optimization: optimizationResult,
-    },
-  });
+  try {
+    const providerResult = await runProvider({
+      provider,
+      model,
+      prompt:
+        optimizationResult.finalPrompt ||
+        optimizationResult.compressedPrompt,
+      raw: {
+        optimization: optimizationResult,
+      },
+    });
 
-  return sendSuccess(res, req, {
-    optimization: optimizationResult,
-    provider: providerResult,
-  });
+    return sendSuccess(res, req, {
+      optimization: optimizationResult,
+      provider: {
+        status: "success",
+        result: providerResult,
+      },
+    });
+  } catch (error) {
+    return sendSuccess(res, req, {
+      optimization: optimizationResult,
+      provider: {
+        status: "failed",
+        error: error.message,
+      },
+    });
+  }
 }

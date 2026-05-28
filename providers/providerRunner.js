@@ -1,6 +1,8 @@
 import { runOpenAIProvider } from "./cloud/openai/openai.adapter.js";
 import { runOllamaProvider } from "./local/ollama/ollama.adapter.js";
 
+import { providerRegistry, listProviderMetadata } from "./providerRegistry.js";
+
 const providers = {
   openai: runOpenAIProvider,
   ollama: runOllamaProvider,
@@ -26,5 +28,9 @@ export async function runProvider({
 }
 
 export function listProviders() {
-  return Object.keys(providers);
+  return Object.keys(providerRegistry);
+}
+
+export function listProvidersDetailed() {
+  return listProviderMetadata();
 }
