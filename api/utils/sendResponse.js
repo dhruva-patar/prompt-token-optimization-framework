@@ -1,3 +1,8 @@
+function getDurationMs(req) {
+  return req?.startTime ? Date.now() - req.startTime : null;
+}
+
+
 export function sendSuccess(res, req, result, meta = {}) {
   const durationMs = Date.now() - req.startTime;
 
@@ -7,7 +12,8 @@ export function sendSuccess(res, req, result, meta = {}) {
     meta: {
       version: "v1",
       timestamp: new Date().toISOString(),
-      durationMs,
+      durationMs: getDurationMs(req) || 0,
+      requestId: req.requestId,
       ...meta,
     },
   });
@@ -30,7 +36,8 @@ export function sendError(
     meta: {
       version: "v1",
       timestamp: new Date().toISOString(),
-      durationMs,
+      durationMs: getDurationMs(req),
+      requestId: req.requestId,
       ...meta,
     },
   });

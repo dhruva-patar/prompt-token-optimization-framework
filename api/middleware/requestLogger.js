@@ -5,7 +5,19 @@ export function requestLogger(req, res, next) {
     const durationMs = Date.now() - start;
 
     console.log(
-      `${req.method} ${req.originalUrl} ${res.statusCode} - ${durationMs}ms`
+      JSON.stringify({
+        requestId: req.requestId,
+        method: req.method,
+        route: req.originalUrl,
+        statusCode: res.statusCode,
+        provider: req.execution?.provider || null,
+        executionStatus:
+          req.execution?.executionStatus || null,
+        providerStatus:
+          req.execution?.providerStatus || null,
+        durationMs,
+        timestamp: new Date().toISOString(),
+      })
     );
   });
 

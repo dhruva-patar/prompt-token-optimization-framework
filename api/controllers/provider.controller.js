@@ -1,6 +1,7 @@
 import { optimizePrompt } from "../../core/optimizer.js";
 import { runProvider } from "../../providers/providerRunner.js";
 import { sendSuccess } from "../utils/sendResponse.js";
+import { setExecutionContext } from "../utils/setExecutionContext.js";
 
 export async function runProviderController(req, res) {
   const {
@@ -13,6 +14,13 @@ export async function runProviderController(req, res) {
   const optimizationResult = optimizePrompt(prompt, options);
 
   if (optimizationResult.clarify) {
+    
+    setExecutionContext(req, {
+      provider,
+      executionStatus: "skipped",
+      providerStatus: "clarification_required",
+    });
+    
     return sendSuccess(res, req, {
       optimization: optimizationResult,
       provider: {
@@ -34,6 +42,12 @@ export async function runProviderController(req, res) {
       },
     });
 
+    setExecutionContext(req, {
+      provider,
+      executionStatus: "success",
+      providerStatus: "active",
+    });
+
     return sendSuccess(res, req, {
       optimization: optimizationResult,
       provider: {
@@ -42,6 +56,12 @@ export async function runProviderController(req, res) {
       },
     });
   } catch (error) {
+    setExecutionContext(req, {
+      provider,
+      executionStatus: "failed",
+      providerStatus: "misconfigured",
+    });
+
     return sendSuccess(res, req, {
       optimization: optimizationResult,
       provider: {

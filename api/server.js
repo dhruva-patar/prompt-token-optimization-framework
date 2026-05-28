@@ -1,7 +1,9 @@
 import express from "express";
-import { env } from "../config/env.js";
-import { requestLogger } from "./middleware/requestLogger.js";
+
+import { requestId } from "./middleware/requestId.js";
 import { requestTimer } from "./middleware/requestTimer.js";
+import { requestLogger } from "./middleware/requestLogger.js";
+import { env } from "../config/env.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import providerRoutes from "./v1/routes/provider.routes.js";
 import optimizeRoutes from "./v1/routes/optimize.routes.js";
@@ -14,6 +16,8 @@ const app = express();
 const PORT = env.port;
 
 app.use(express.json());
+
+app.use(requestId);
 
 app.use(requestLogger);
 app.use(requestTimer);
