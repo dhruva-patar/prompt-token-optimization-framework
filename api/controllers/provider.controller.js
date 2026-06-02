@@ -2,6 +2,7 @@ import { optimizePrompt } from "../../core/optimizer.js";
 import { runProvider } from "../../providers/providerRunner.js";
 import { sendSuccess } from "../utils/sendResponse.js";
 import { setExecutionContext } from "../utils/setExecutionContext.js";
+import { classifyProviderError } from "../../providers/providerErrorClassifier.js";
 
 export async function runProviderController(req, res) {
   const {
@@ -56,16 +57,19 @@ export async function runProviderController(req, res) {
       },
     });
   } catch (error) {
+    const providerStatus = classifyProviderError(error);
+
     setExecutionContext(req, {
       provider,
       executionStatus: "failed",
-      providerStatus: "misconfigured",
+      providerStatus,
     });
 
     return sendSuccess(res, req, {
       optimization: optimizationResult,
       provider: {
         status: "failed",
+        providerStatus,
         error: error.message,
       },
     });
