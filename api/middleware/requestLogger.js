@@ -1,8 +1,18 @@
+import { recordRequest }
+  from "../../analytics/requestMetrics.js";
+
 export function requestLogger(req, res, next) {
   const start = Date.now();
 
   res.on("finish", () => {
     const durationMs = Date.now() - start;
+
+    recordRequest({
+      route: req.originalUrl,
+      statusCode: res.statusCode,
+      durationMs,
+      provider: req.execution?.provider,
+    });
 
     console.log(
       JSON.stringify({

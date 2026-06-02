@@ -1,5 +1,8 @@
 import express from "express";
 
+import analyticsRoutes
+  from "./v1/routes/analytics.routes.js";
+
 import { requestId } from "./middleware/requestId.js";
 import { requestTimer } from "./middleware/requestTimer.js";
 import { requestLogger } from "./middleware/requestLogger.js";
@@ -16,6 +19,11 @@ const app = express();
 const PORT = env.port;
 
 app.use(express.json());
+
+app.use(
+  "/v1/analytics",
+  analyticsRoutes
+);
 
 app.use(requestId);
 
