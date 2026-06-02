@@ -37,15 +37,35 @@ export function recordRequest({
 }
 
 export function getMetrics() {
+  const averageDurationMs =
+    metrics.totalRequests > 0
+      ? Math.round(metrics.totalDurationMs / metrics.totalRequests)
+      : 0;
+
+  const successRate =
+    metrics.totalRequests > 0
+      ? Number(
+          (
+            (metrics.successRequests / metrics.totalRequests) *
+            100
+          ).toFixed(2)
+        )
+      : 0;
+
+  const failureRate =
+    metrics.totalRequests > 0
+      ? Number(
+          (
+            (metrics.failedRequests / metrics.totalRequests) *
+            100
+          ).toFixed(2)
+        )
+      : 0;
+
   return {
     ...metrics,
-
-    averageDurationMs:
-      metrics.totalRequests > 0
-        ? Math.round(
-            metrics.totalDurationMs /
-              metrics.totalRequests
-          )
-        : 0,
+    averageDurationMs,
+    successRate,
+    failureRate,
   };
 }
