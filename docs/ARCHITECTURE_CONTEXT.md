@@ -409,6 +409,15 @@ Completed / In Progress:
 
 # Current Middleware Cleanup Roadmap
 
+## Completed Middleware Milestones
+
+- Provider Registry Metadata
+- Request IDs
+- Structured Logging
+- Execution Context
+- Duration Telemetry
+- Provider Error Classification
+
 ## Immediate Stabilization
 
 ### Provider Registry Metadata
