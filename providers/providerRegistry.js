@@ -5,6 +5,17 @@ export const providerRegistry = {
     type: "cloud",
     requiresApiKey: true,
     supportsLocal: false,
+    connectionMode: "oauth",
+    status: "active",
+  },
+
+  claude: {
+    id: "claude",
+    label: "Claude",
+    type: "cloud",
+    requiresApiKey: true,
+    supportsLocal: false,
+    connectionMode: "oauth",
     status: "active",
   },
 
@@ -14,6 +25,7 @@ export const providerRegistry = {
     type: "local",
     requiresApiKey: false,
     supportsLocal: true,
+    connectionMode: "local",
     status: "active",
   },
 };

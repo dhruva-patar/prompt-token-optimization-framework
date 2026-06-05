@@ -9,6 +9,8 @@ export function getProviderHealth() {
 
       registryStatus: provider.status || "unknown",
       runtimeStatus: "unknown",
+      
+      connectionMode: provider.connectionMode,
 
       requiresApiKey: provider.requiresApiKey,
       supportsLocal: provider.supportsLocal,

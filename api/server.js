@@ -1,5 +1,7 @@
 import express from "express";
 
+import cors from "cors";
+
 import analyticsRoutes
   from "./v1/routes/analytics.routes.js";
 
@@ -24,6 +26,14 @@ app.use(
   "/v1/analytics",
   analyticsRoutes
 );
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+}));
+
+app.use(express.json());
 
 app.use(requestId);
 
