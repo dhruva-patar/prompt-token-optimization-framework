@@ -9,7 +9,7 @@ export function getProviderHealth() {
 
       registryStatus: provider.status || "unknown",
       runtimeStatus: "unknown",
-      
+      models: provider.models || [],
       connectionMode: provider.connectionMode,
 
       requiresApiKey: provider.requiresApiKey,
