@@ -35,11 +35,21 @@ export function prepareHandoffController(req, res) {
 
 export async function runProviderController(req, res) {
   const {
-    provider = "chatgpt",
+    provider,
     model,
     prompt,
     options = {},
   } = req.body;
+
+  if (!provider) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: "MISSING_EXECUTABLE_PROVIDER",
+        message: "Provider is required for executable provider runs.",
+      },
+    });
+  }
 
   const optimizationResult = optimizePrompt(prompt, options);
 
