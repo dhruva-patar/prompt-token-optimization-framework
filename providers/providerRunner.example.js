@@ -1,30 +1,32 @@
+import "dotenv/config";
 import {
-  runProvider,
+  executeProviderPrompt,
   listProviders,
   listProvidersDetailed,
 } from "./providerRunner.js";
 
 async function run() {
-  console.log("Available providers:", listProviders());
-
   console.log(
-    "Provider metadata:",
-    listProvidersDetailed()
+    "Available providers:", listProviders()
   );
 
-  try {
-    const result = await runProvider({
-      provider: "openai",
-      prompt:
-        "Compare GPT and Claude for code review.",
-    });
+  console.log(
+    "Provider metadata:", listProvidersDetailed()
+  );
 
-    console.log("Provider result:");
-    console.log(result);
-  } catch (error) {
-    console.log("Provider execution failed:");
-    console.log(error.message);
+
+  const result = await executeProviderPrompt({
+    providerId: "openai",
+    modelId: process.env.OPENAI_DEFAULT_MODEL || "gpt-4o-mini",
+    finalPrompt: "Explain PTOF in one sentence.",
+  });
+
+  console.log(JSON.stringify(result, null, 2));
+
+  console.log("Provider result:");
+  console.log(JSON.stringify(result, null, 2));
   }
-}
+
+
 
 run().catch(console.error);
