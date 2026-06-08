@@ -1,12 +1,41 @@
 import { optimizePrompt } from "../../core/optimizer.js";
-import { runProvider } from "../../providers/providerRunner.js";
+import { runProvider, prepareProviderHandoff } from "../../providers/providerRunner.js";
 import { sendSuccess } from "../utils/sendResponse.js";
 import { setExecutionContext } from "../utils/setExecutionContext.js";
 import { classifyProviderError } from "../../providers/providerErrorClassifier.js";
 
+export function prepareHandoffController(req, res) {
+  try {
+    const {
+      providerId = "chatgpt",
+      modelId,
+      finalPrompt,
+    } = req.body || {};
+
+    const handoff = prepareProviderHandoff({
+      providerId,
+      modelId,
+      finalPrompt,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: handoff,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: "PROVIDER_HANDOFF_FAILED",
+        message: error.message || "Provider handoff failed.",
+      },
+    });
+  }
+}
+
 export async function runProviderController(req, res) {
   const {
-    provider = "openai",
+    provider = "chatgpt",
     model,
     prompt,
     options = {},
