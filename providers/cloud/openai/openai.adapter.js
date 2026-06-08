@@ -21,26 +21,6 @@ export async function runOpenAIProvider({
     apiKey: env.openai.apiKey,
   });
 
-  /*const response = await client.responses.create({
-    model,
-    input: prompt,
-  });
-
-  const output = response.output_text || "";
-
-  return normalizeProviderResponse({
-    provider: "openai",
-    model,
-    output,
-    usage: {
-      inputTokens: response.usage?.input_tokens,
-      outputTokens: response.usage?.output_tokens,
-      totalTokens: response.usage?.total_tokens,
-    },
-    latencyMs: Date.now() - start,
-    raw,
-  });*/
-
   const response = await Promise.race([
     client.responses.create({
       model,
@@ -55,4 +35,19 @@ export async function runOpenAIProvider({
       )
     ),
   ]);
+
+  const output = response.output_text || "";
+
+  return normalizeProviderResponse({
+    provider: "openai",
+    model,
+    output,
+    usage: {
+      inputTokens: response.usage?.input_tokens ?? null,
+      outputTokens: response.usage?.output_tokens ?? null,
+      totalTokens: response.usage?.total_tokens ?? null,
+    },
+    latencyMs: Date.now() - start,
+    raw: raw ? response : null,
+  });
 }
