@@ -6,6 +6,8 @@ import { needsClarification } from "./clarification/needsClarification.js";
 import { runLongPromptStructurer } from "./structure/longPromptStructurer.js";
 import { blendFormats } from "./formatting/blendFormats.js";
 import { applyResponseMode } from "./responseModes/applyResponseMode.js";
+import { getPresetById } from "../presets/presetRegistry.js";
+
 
 function estimateTokens(text) {
   if (!text || !text.trim()) return 0;
@@ -38,6 +40,10 @@ function compressBasic(text) {
 export function optimizePrompt(userPrompt, options = {}) {
   const responseModeOption = options.responseMode || "default";
 
+  const preset = options.presetId
+  ? getPresetById(options.presetId)
+  : null;
+
   if (!userPrompt || !userPrompt.trim()) {
     return {
       compressedPrompt: "",
@@ -48,6 +54,12 @@ export function optimizePrompt(userPrompt, options = {}) {
       clarify: "",
       shortPrompt: false,
       tokenCount: 0,
+      optimizationMetrics: {
+        beforeTokens: 0,
+        afterTokens: 0,
+        tokensSaved: 0,
+        reductionPercent: 0,
+      },
       responseMode: {
         key: "default",
         displayName: "Default",
@@ -60,13 +72,13 @@ export function optimizePrompt(userPrompt, options = {}) {
   const shortPrompt = tokenCount < 15;
 
   const type = classifyPrompt(userPrompt);
-
   const stripped = shortPrompt ? userPrompt.trim() : stripFiller(userPrompt);
 
   const typeSignals = detectTypeSignals(userPrompt);
   const uniqueTypes = [...new Set(typeSignals.map((signal) => signal.type))];
 
   const complex = uniqueTypes.length > 1 || detectComplexity(stripped);
+  const formatRule = blendFormats(type, typeSignals, complex);
 
   if (needsClarification(userPrompt, type)) {
     return {
@@ -77,11 +89,15 @@ export function optimizePrompt(userPrompt, options = {}) {
       clarify: "Please share the missing input so I can analyze it accurately.",
       shortPrompt,
       tokenCount,
+      optimizationMetrics: {
+        beforeTokens: tokenCount,
+        afterTokens: 0,
+        tokensSaved: 0,
+        reductionPercent: 0,
+      },
       formatRule: blendFormats(type, typeSignals, complex),
     };
   }
-
-  const formatRule = blendFormats(type, typeSignals, complex);
 
   const cleanStripped = stripped
     .replace(/[?.!]+$/, "")
@@ -96,7 +112,6 @@ export function optimizePrompt(userPrompt, options = {}) {
   );
 
   const compressedCore = pipelineResult.compressedText;
-
   const baseCompressedPrompt = `${compressedCore}.`;
 
   const responseModeResult = applyResponseMode(
@@ -104,9 +119,33 @@ export function optimizePrompt(userPrompt, options = {}) {
     responseModeOption
   );
 
+  const presetInstruction = preset?.macroCode || preset?.hiddenInstruction || "";
+
+  const finalPromptWithPreset = presetInstruction
+    ? `${responseModeResult.finalPrompt}\n\n${presetInstruction}`
+    : responseModeResult.finalPrompt;
+
+  const beforeTokens = tokenCount;
+  //const afterTokens = estimateTokens(responseModeResult.finalPrompt);
+  const afterTokens = estimateTokens(finalPromptWithPreset);
+
+  const tokensSaved = Math.max(beforeTokens - afterTokens, 0);
+
+  const reductionPercent =
+    beforeTokens > 0
+      ? Math.round((tokensSaved / beforeTokens) * 100)
+      : 0;
+
   return {
     compressedPrompt: baseCompressedPrompt,
-    finalPrompt: responseModeResult.finalPrompt,
+    finalPrompt: finalPromptWithPreset,
+    presetApplied: preset
+      ? {
+          id: preset.id,
+          displayName: preset.displayName,
+          providerType: preset.providerType,
+        }
+      : null,
     responseEnhancementBlock: responseModeResult.enhancementBlock,
     type,
     complex,
@@ -121,6 +160,12 @@ export function optimizePrompt(userPrompt, options = {}) {
     clarify: "",
     shortPrompt,
     tokenCount,
+    optimizationMetrics: {
+      beforeTokens,
+      afterTokens,
+      tokensSaved,
+      reductionPercent,
+    },
     formatRule,
     responseMode: responseModeResult.responseMode,
   };

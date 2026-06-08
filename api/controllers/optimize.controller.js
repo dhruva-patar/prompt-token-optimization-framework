@@ -2,9 +2,12 @@ import { optimizePrompt } from "../../core/optimizer.js";
 import { sendSuccess } from "../utils/sendResponse.js";
 
 export async function optimizeController(req, res) {
-  const { prompt, options } = req.body;
+  const { prompt, responseMode, presetId } = req.body;
 
-  const result = optimizePrompt(prompt, options || {});
+  const result = optimizePrompt(prompt, {
+    responseMode,
+    presetId,
+  });
 
   return sendSuccess(res, req, result);
 }

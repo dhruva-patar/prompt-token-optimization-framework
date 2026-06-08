@@ -278,3 +278,9 @@ export function listPresets({ providerType } = {}) {
     (preset) => preset.providerType === "generic"
   );
 }
+
+export function getPresetById(id) {
+  return (
+    presetRegistry.find((preset) => preset.id === Number(id)) || null
+  );
+}
