@@ -24,16 +24,18 @@ export function normalizeProviderResponse({
   provider,
   model,
   output,
-  usage = {},
-  latencyMs,
+  usage = null,
+  latencyMs = null,
   raw = null,
 }) {
   return {
-    provider,
-    model,
-    output,
-    usage,
+    success: true,
+    providerId: provider,
+    modelId: model,
+    responseText: output,
     latencyMs,
+    usage,
+    error: null,
     raw,
   };
 }
