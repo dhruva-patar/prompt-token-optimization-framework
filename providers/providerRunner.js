@@ -1,25 +1,45 @@
-import { runOpenAIProvider } from "./cloud/openai/openai.adapter.js";
 import { runOllamaProvider } from "./local/ollama/ollama.adapter.js";
+import { runOpenAIProvider } from "./cloud/openai/openai.adapter.js";
 
 import { providerRegistry, listProviderMetadata } from "./providerRegistry.js";
 import { createProviderError } from "./providerContract.js";
 
-const providers = {
-  openai: runOpenAIProvider,
-  chatgpt: runOpenAIProvider,
+const executableProviders = {
+  openai: runOpenAIProvider, // future API execution scaffold
   ollama: runOllamaProvider,
 };
 
+const handoffProviders = {
+  chatgpt: {
+    providerId: "chatgpt",
+    label: "ChatGPT",
+    handoffUrl: "https://chatgpt.com",
+    handoffMode: "copy_or_open",
+  },
+  claude: {
+    providerId: "claude",
+    label: "Claude",
+    handoffUrl: "https://claude.ai",
+    handoffMode: "copy_or_open",
+  },
+  perplexity: {
+    providerId: "perplexity",
+    label: "Perplexity",
+    handoffUrl: "https://www.perplexity.ai",
+    handoffMode: "copy_or_open",
+  },
+};
+
 export async function runProvider({
-  provider = "openai",
+  provider,
   prompt,
   model,
   raw = null,
 } = {}) {
-  const selectedProvider = providers[provider];
+  const selectedProvider = executableProviders[provider];
 
   if (!selectedProvider) {
-    throw new Error(`Unsupported provider: ${provider}`);
+    throw new Error(`Unsupported executable provider: ${provider}`);
   }
 
   return selectedProvider({
@@ -27,6 +47,35 @@ export async function runProvider({
     model,
     raw,
   });
+}
+
+export function prepareProviderHandoff({
+  providerId = "chatgpt",
+  modelId,
+  finalPrompt,
+} = {}) {
+  const normalizedProviderId = providerId?.toLowerCase();
+  const selectedProvider = handoffProviders[normalizedProviderId];
+
+  if (!selectedProvider) {
+    throw new Error(`Unsupported handoff provider: ${normalizedProviderId}`);
+  }
+
+  if (!finalPrompt || typeof finalPrompt !== "string") {
+    throw new Error("Final prompt is required for provider handoff");
+  }
+
+  return {
+    success: true,
+    providerId: selectedProvider.providerId,
+    modelId,
+    providerLabel: selectedProvider.label,
+    executionMode: "manual",
+    handoffMode: selectedProvider.handoffMode,
+    handoffUrl: selectedProvider.handoffUrl,
+    finalPrompt,
+    message: `Prompt prepared for ${selectedProvider.label}. Copy it or open ${selectedProvider.label} to continue.`,
+  };
 }
 
 export async function executeProviderPrompt({
@@ -55,14 +104,14 @@ export async function executeProviderPrompt({
     });
   }
 
-  const selectedProvider = providers[normalizedProviderId];
+  const selectedProvider = executableProviders[normalizedProviderId];
 
   if (!selectedProvider) {
     return createProviderError({
       providerId: normalizedProviderId,
       modelId,
-      message: `Unsupported provider: ${normalizedProviderId}`,
-      code: "UNSUPPORTED_PROVIDER",
+      message: `Unsupported executable provider: ${normalizedProviderId}`,
+      code: "UNSUPPORTED_EXECUTABLE_PROVIDER",
     });
   }
 
