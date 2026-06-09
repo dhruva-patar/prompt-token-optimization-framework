@@ -1,30 +1,76 @@
 export const providerRegistry = {
-  openai: {
+  chatgpt: {
     id: "chatgpt",
     label: "ChatGPT",
-    type: "cloud",
-    requiresApiKey: true,
+    type: "subscription",
+    requiresApiKey: false,
     supportsLocal: false,
-    connectionMode: "oauth",
+    connectionMode: "handoff",
+    executionMode: "manual",
+    executable: false,
     status: "active",
+    handoff: {
+      mode: "copy_or_open",
+      url: "https://chatgpt.com"
+    },
     models: [
-      { id: "gpt-4o-mini", label: "GPT-4o mini", isDefault: true },
-      { id: "gpt-4o", label: "GPT-4o", isDefault: false },
-    ],
+      {
+        id: "gpt-4o",
+        label: "GPT-4o"
+      },
+      {
+        id: "gpt-4o-mini",
+        label: "GPT-4o mini"
+      }
+    ]
   },
 
   claude: {
-    id: "claude",
-    label: "Claude",
-    type: "cloud",
-    requiresApiKey: true,
+  id: "claude",
+  label: "Claude",
+  type: "subscription",
+  requiresApiKey: false,
+  supportsLocal: false,
+  connectionMode: "handoff",
+  executionMode: "manual",
+  executable: false,
+  status: "active",
+  handoff: {
+    mode: "copy_or_open",
+    url: "https://claude.ai"
+  },
+  models: [
+    {
+      id: "claude-sonnet",
+      label: "Claude Sonnet"
+    },
+    {
+      id: "claude-opus",
+      label: "Claude Opus"
+    }
+  ]
+},
+
+  perplexity: {
+    id: "perplexity",
+    label: "Perplexity",
+    type: "subscription",
+    requiresApiKey: false,
     supportsLocal: false,
-    connectionMode: "oauth",
+    connectionMode: "handoff",
+    executionMode: "manual",
+    executable: false,
     status: "active",
+    handoff: {
+      mode: "copy_or_open",
+      url: "https://www.perplexity.ai"
+    },
     models: [
-      { id: "claude-3-5-sonnet", label: "Claude 3.5 Sonnet", isDefault: true },
-      { id: "claude-3-haiku", label: "Claude 3 Haiku", isDefault: false },
-    ],
+      {
+        id: "default",
+        label: "Default"
+      }
+    ]
   },
 
   ollama: {
@@ -34,10 +80,18 @@ export const providerRegistry = {
     requiresApiKey: false,
     supportsLocal: true,
     connectionMode: "local",
-    status: "active",
+    executionMode: "local_optional",
+    executable: true,
+    status: "experimental",
+    handoff: {
+      mode: "local"
+    },
     models: [
-      { id: "llama3.1", label: "Llama 3.1", isDefault: true },
-    ],
+      {
+        id: "qwen2.5:0.5b",
+        label: "Qwen 2.5 0.5B"
+      }
+    ]
   },
 };
 
