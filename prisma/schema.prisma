@@ -1,0 +1,274 @@
+// PTOF Prisma Schema
+// Phase 9: Database & Persistence Foundation
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------------------------------------
+// Users
+// Placeholder for future auth/account layer.
+// ------------------------------------------------------------
+
+model User {
+  id          String  @id @default(uuid()) @db.Uuid
+  email       String? @unique
+  displayName String? @map("display_name")
+
+  providerConnections ProviderConnection[]
+  sessions            Session[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("users")
+}
+
+// ------------------------------------------------------------
+// Providers
+// Backend-owned provider metadata.
+// Seeded from providerRegistry.js initially.
+// ------------------------------------------------------------
+
+model Provider {
+  id             String  @id
+  label          String
+  type           String
+  connectionMode String  @map("connection_mode")
+  executionMode  String  @default("manual") @map("execution_mode")
+  executable     Boolean @default(false)
+  requiresAuth   Boolean @default(false) @map("requires_auth")
+  requiresApiKey Boolean @default(false) @map("requires_api_key")
+  supportsLocal  Boolean @default(false) @map("supports_local")
+  status         String  @default("active")
+  handoffUrl     String? @map("handoff_url")
+
+  models      ProviderModel[]
+  connections ProviderConnection[]
+  presets     Preset[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("providers")
+}
+
+// ------------------------------------------------------------
+// Provider Models
+// ------------------------------------------------------------
+
+model ProviderModel {
+  id         String @id @default(uuid()) @db.Uuid
+  providerId String @map("provider_id")
+  modelId    String @map("model_id")
+  label      String
+  status     String @default("active")
+
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([providerId, modelId])
+  @@index([providerId])
+  @@map("provider_models")
+}
+
+// ------------------------------------------------------------
+// Provider Connections
+// User/provider connection state.
+// ------------------------------------------------------------
+
+model ProviderConnection {
+  id         String @id @default(uuid()) @db.Uuid
+  userId     String @map("user_id") @db.Uuid
+  providerId String @map("provider_id")
+
+  status            String    @default("connected")
+  authType          String?   @map("auth_type")
+  encryptedTokenRef String?   @map("encrypted_token_ref")
+  metadata          Json      @default("{}")
+  connectedAt       DateTime? @map("connected_at") @db.Timestamptz
+  disconnectedAt    DateTime? @map("disconnected_at") @db.Timestamptz
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([userId, providerId])
+  @@index([userId])
+  @@index([providerId])
+  @@map("provider_connections")
+}
+
+// ------------------------------------------------------------
+// Presets
+// Backend-owned preset registry.
+// ------------------------------------------------------------
+
+model Preset {
+  id          String  @id @default(uuid()) @db.Uuid
+  presetKey   String  @unique @map("preset_key")
+  label       String
+  category    String?
+  providerId  String? @map("provider_id")
+  macroCode   String? @map("macro_code")
+  instruction String?
+  isGeneric   Boolean @default(true) @map("is_generic")
+  status      String  @default("active")
+
+  provider         Provider?         @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  optimizationRuns OptimizationRun[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([providerId])
+  @@map("presets")
+}
+
+// ------------------------------------------------------------
+// Sessions
+// Conversation container.
+// status:
+// 0 = active
+// 1 = archived
+// 2 = deleted
+// ------------------------------------------------------------
+
+model Session {
+  id            String  @id @default(uuid()) @db.Uuid
+  userId        String? @map("user_id") @db.Uuid
+  providerId    String  @map("provider_id")
+  providerLabel String? @map("provider_label")
+  modelId       String? @map("model_id")
+  title         String  @default("New session")
+
+  status         Int       @default(0) @db.SmallInt
+  lastActivityAt DateTime  @default(now()) @map("last_activity_at") @db.Timestamptz
+  archivedAt     DateTime? @map("archived_at") @db.Timestamptz
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz
+
+  user             User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages         Message[]
+  optimizationRuns OptimizationRun[]
+  providerRuns     ProviderRun[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([userId])
+  @@index([providerId])
+  @@index([status])
+  @@index([lastActivityAt])
+  @@map("sessions")
+}
+
+// ------------------------------------------------------------
+// Messages
+// User-visible chat messages.
+// ------------------------------------------------------------
+
+model Message {
+  id        String  @id @default(uuid()) @db.Uuid
+  sessionId String  @map("session_id") @db.Uuid
+  role      String
+  content   String?
+
+  session          Session           @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  optimizationRuns OptimizationRun[]
+  providerRuns     ProviderRun[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// ------------------------------------------------------------
+// Optimization Runs
+// PTOF optimization log.
+// ------------------------------------------------------------
+
+model OptimizationRun {
+  id        String  @id @default(uuid()) @db.Uuid
+  sessionId String  @map("session_id") @db.Uuid
+  messageId String? @map("message_id") @db.Uuid
+
+  originalPrompt  String  @map("original_prompt")
+  optimizedPrompt String? @map("optimized_prompt")
+  finalPrompt     String? @map("final_prompt")
+
+  promptType       String?  @map("prompt_type")
+  complexity       Boolean?
+  formatRule       String?  @map("format_rule")
+  tokenBefore      Int?     @map("token_before")
+  tokenAfter       Int?     @map("token_after")
+  tokensSaved      Int?     @map("tokens_saved")
+  reductionPercent Decimal? @map("reduction_percent") @db.Decimal(6, 2)
+
+  presetId   String? @map("preset_id") @db.Uuid
+  providerId String? @map("provider_id")
+  modelId    String? @map("model_id")
+
+  notes    Json @default("[]")
+  metadata Json @default("{}")
+
+  session      Session       @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  message      Message?      @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  preset       Preset?       @relation(fields: [presetId], references: [id], onDelete: SetNull)
+  providerRuns ProviderRun[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([sessionId])
+  @@index([messageId])
+  @@index([providerId])
+  @@map("optimization_runs")
+}
+
+// ------------------------------------------------------------
+// Provider Runs
+// LLM/provider execution log.
+// ------------------------------------------------------------
+
+model ProviderRun {
+  id                String  @id @default(uuid()) @db.Uuid
+  sessionId         String  @map("session_id") @db.Uuid
+  messageId         String? @map("message_id") @db.Uuid
+  optimizationRunId String? @map("optimization_run_id") @db.Uuid
+
+  providerId String  @map("provider_id")
+  modelId    String? @map("model_id")
+
+  status       String  @default("success")
+  responseText String? @map("response_text")
+  errorCode    String? @map("error_code")
+  errorMessage String? @map("error_message")
+
+  latencyMs    Int? @map("latency_ms")
+  inputTokens  Int? @map("input_tokens")
+  outputTokens Int? @map("output_tokens")
+  totalTokens  Int? @map("total_tokens")
+
+  raw Json?
+
+  session         Session          @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  message         Message?         @relation(fields: [messageId], references: [id], onDelete: SetNull)
+  optimizationRun OptimizationRun? @relation(fields: [optimizationRunId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([sessionId])
+  @@index([messageId])
+  @@index([providerId])
+  @@map("provider_runs")
+}
