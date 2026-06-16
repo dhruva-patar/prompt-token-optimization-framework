@@ -11,7 +11,11 @@
     "benchmark:large": "node benchmark/largeBenchmarkSuite.js",
     "contract": "node benchmark/algorithmContractSuite.js",
     "ptof": "node cli/ptof-cli.js",
-    "api": "node api/server.js"
+    "api": "node api/server.js",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev"
   },
   "keywords": [
     "prompt-engineering",
@@ -24,11 +28,13 @@
   "author": "Dhruva Patar",
   "license": "MIT",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "openai": "^6.39.0"
+    "openai": "^6.39.0",
+    "pg": "^8.21.0"
   },
   "devDependencies": {
     "prisma": "^7.8.0"
