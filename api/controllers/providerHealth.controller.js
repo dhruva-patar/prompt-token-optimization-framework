@@ -1,6 +1,6 @@
-import { getProviderHealth } from "../../providers/providerHealth.js";
+import { listProviderMetadataFromSource } from "../../providers/provider.service.js";
 import { sendSuccess } from "../utils/sendResponse.js";
-import { env } from "../../config/env.js";
+import { enrichProviderRuntimeHealth } from "../../providers/providerRuntimeHealth.service.js";
 
 async function checkOllamaHealth() {
   const baseUrl = env.ollama?.baseUrl || "http://127.0.0.1:11434";
@@ -48,7 +48,7 @@ async function checkOllamaHealth() {
   }
 }
 
-export async function providerHealthController(req, res) {
+/*export async function providerHealthController(req, res) {
   const health = getProviderHealth();
 
   const providers = await Promise.all(
@@ -66,6 +66,20 @@ export async function providerHealthController(req, res) {
         availableModels: ollamaHealth.availableModels,
       };
     })
+  );
+
+  return sendSuccess(res, req, {
+    providers,
+  });
+}*/
+
+export async function providerHealthController(req, res) {
+  const providerMetadata = await listProviderMetadataFromSource();
+
+  const providers = await Promise.all(
+    providerMetadata.map((provider) =>
+      enrichProviderRuntimeHealth(provider)
+    )
   );
 
   return sendSuccess(res, req, {
