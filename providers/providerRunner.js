@@ -1,7 +1,7 @@
 import { runOllamaProvider } from "./local/ollama/ollama.adapter.js";
 import { runOpenAIProvider } from "./cloud/openai/openai.adapter.js";
-
-import { providerRegistry, listProviderMetadata } from "./providerRegistry.js";
+import { listProviderMetadataFromSource } from "./provider.service.js";
+//import { providerRegistry, listProviderMetadata } from "./providerRegistry.js";
 import { createProviderError } from "./providerContract.js";
 
 const executableProviders = {
@@ -132,10 +132,11 @@ export async function executeProviderPrompt({
   }
 }
 
-export function listProviders() {
-  return Object.keys(providerRegistry);
+export async function listProviders() {
+  const providers = await listProviderMetadataFromSource();
+  return providers.map((provider) => provider.id);
 }
 
-export function listProvidersDetailed() {
-  return listProviderMetadata();
+export async function listProvidersDetailed() {
+  return listProviderMetadataFromSource();
 }

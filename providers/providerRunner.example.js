@@ -6,13 +6,8 @@ import {
 } from "./providerRunner.js";
 
 async function run() {
-  console.log(
-    "Available providers:", listProviders()
-  );
-
-  console.log(
-    "Provider metadata:", listProvidersDetailed()
-  );
+  console.log("Available providers:", await listProviders());
+console.log("Provider metadata:", await listProvidersDetailed());
 
 
   const result = await executeProviderPrompt({
