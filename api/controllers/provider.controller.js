@@ -3,6 +3,7 @@ import { runProvider, prepareProviderHandoff } from "../../providers/providerRun
 import { sendSuccess } from "../utils/sendResponse.js";
 import { setExecutionContext } from "../utils/setExecutionContext.js";
 import { classifyProviderError } from "../../providers/providerErrorClassifier.js";
+import { createChatTurnLogInDb } from "../../sessions/services/chatLog.service.js";
 
 export function prepareHandoffController(req, res) {
   try {
@@ -39,6 +40,8 @@ export async function runProviderController(req, res) {
     model,
     prompt,
     options = {},
+    persist = false,
+    sessionId = null,
   } = req.body;
 
   if (!provider) {
@@ -54,13 +57,12 @@ export async function runProviderController(req, res) {
   const optimizationResult = optimizePrompt(prompt, options);
 
   if (optimizationResult.clarify) {
-    
     setExecutionContext(req, {
       provider,
       executionStatus: "skipped",
       providerStatus: "clarification_required",
     });
-    
+
     return sendSuccess(res, req, {
       optimization: optimizationResult,
       provider: {
@@ -82,6 +84,79 @@ export async function runProviderController(req, res) {
       },
     });
 
+    let dbLog = null;
+    let persistenceWarning = null;
+
+    if (persist) {
+      try {
+        dbLog = await createChatTurnLogInDb({
+          sessionId,
+
+          providerId: provider,
+          providerLabel: provider,
+          modelId: model,
+          title: prompt.slice(0, 48),
+
+          userContent: prompt,
+          assistantContent:
+            providerResult?.responseText ||
+            providerResult?.output ||
+            providerResult?.content ||
+            null,
+
+          optimization: {
+            originalPrompt: prompt,
+            optimizedPrompt: optimizationResult.compressedPrompt,
+            finalPrompt: optimizationResult.finalPrompt,
+            promptType: optimizationResult.type,
+            complexity: optimizationResult.complex,
+            formatRule: optimizationResult.formatRule,
+
+            tokenBefore:
+              optimizationResult.optimizationMetrics?.beforeTokens,
+            tokenAfter:
+              optimizationResult.optimizationMetrics?.afterTokens,
+            tokensSaved:
+              optimizationResult.optimizationMetrics?.tokensSaved,
+            reductionPercent:
+              optimizationResult.optimizationMetrics?.reductionPercent,
+
+            presetId: null,
+            notes: optimizationResult.notes || [],
+            metadata: {
+              source: "providers_run",
+              shortPrompt: optimizationResult.shortPrompt || false,
+              tokenCount: optimizationResult.tokenCount,
+              responseMode: optimizationResult.responseMode || null,
+            },
+          },
+
+          providerRun: {
+            status: providerResult?.success === false ? "failed" : "success",
+            responseText:
+              providerResult?.responseText ||
+              providerResult?.output ||
+              providerResult?.content ||
+              null,
+            errorCode: providerResult?.error?.code || null,
+            errorMessage:
+              providerResult?.error?.message ||
+              providerResult?.error ||
+              null,
+
+            latencyMs: providerResult?.latencyMs || null,
+            inputTokens: providerResult?.usage?.inputTokens || null,
+            outputTokens: providerResult?.usage?.outputTokens || null,
+            totalTokens: providerResult?.usage?.totalTokens || null,
+
+            raw: providerResult?.raw || null,
+          },
+        });
+      } catch (error) {
+        persistenceWarning = error.message;
+      }
+    }
+
     setExecutionContext(req, {
       provider,
       executionStatus: "success",
@@ -94,9 +169,79 @@ export async function runProviderController(req, res) {
         status: "success",
         result: providerResult,
       },
+      persistence: persist
+        ? {
+            status: dbLog ? "saved" : "failed",
+            sessionId: dbLog?.session?.id || sessionId || null,
+            warning: persistenceWarning,
+          }
+        : {
+            status: "skipped",
+          },
     });
   } catch (error) {
     const providerStatus = classifyProviderError(error);
+
+    let dbLog = null;
+    let persistenceWarning = null;
+
+    if (persist) {
+      try {
+        dbLog = await createChatTurnLogInDb({
+          sessionId,
+
+          providerId: provider,
+          providerLabel: provider,
+          modelId: model,
+          title: prompt.slice(0, 48),
+
+          userContent: prompt,
+          assistantContent: `Provider execution failed.${
+            error.message ? `\nReason: ${error.message}` : ""
+          }`,
+
+          optimization: {
+            originalPrompt: prompt,
+            optimizedPrompt: optimizationResult.compressedPrompt,
+            finalPrompt: optimizationResult.finalPrompt,
+            promptType: optimizationResult.type,
+            complexity: optimizationResult.complex,
+            formatRule: optimizationResult.formatRule,
+
+            tokenBefore:
+              optimizationResult.optimizationMetrics?.beforeTokens,
+            tokenAfter:
+              optimizationResult.optimizationMetrics?.afterTokens,
+            tokensSaved:
+              optimizationResult.optimizationMetrics?.tokensSaved,
+            reductionPercent:
+              optimizationResult.optimizationMetrics?.reductionPercent,
+
+            presetId: null,
+            notes: optimizationResult.notes || [],
+            metadata: {
+              source: "providers_run",
+              shortPrompt: optimizationResult.shortPrompt || false,
+              tokenCount: optimizationResult.tokenCount,
+              responseMode: optimizationResult.responseMode || null,
+            },
+          },
+
+          providerRun: {
+            status: "failed",
+            responseText: null,
+            errorCode: providerStatus,
+            errorMessage: error.message || "Provider execution failed.",
+            raw: {
+              message: error.message,
+              providerStatus,
+            },
+          },
+        });
+      } catch (persistenceError) {
+        persistenceWarning = persistenceError.message;
+      }
+    }
 
     setExecutionContext(req, {
       provider,
@@ -111,6 +256,15 @@ export async function runProviderController(req, res) {
         providerStatus,
         error: error.message,
       },
+      persistence: persist
+        ? {
+            status: dbLog ? "saved" : "failed",
+            sessionId: dbLog?.session?.id || sessionId || null,
+            warning: persistenceWarning,
+          }
+        : {
+            status: "skipped",
+          },
     });
   }
 }
