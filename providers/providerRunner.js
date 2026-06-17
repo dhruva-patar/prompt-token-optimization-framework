@@ -1,7 +1,6 @@
 import { runOllamaProvider } from "./local/ollama/ollama.adapter.js";
 import { runOpenAIProvider } from "./cloud/openai/openai.adapter.js";
 import { listProviderMetadataFromSource } from "./provider.service.js";
-//import { providerRegistry, listProviderMetadata } from "./providerRegistry.js";
 import { createProviderError } from "./providerContract.js";
 
 const executableProviders = {
@@ -139,4 +138,4 @@ export async function listProviders() {
 
 export async function listProvidersDetailed() {
   return listProviderMetadataFromSource();
-}
+} 
