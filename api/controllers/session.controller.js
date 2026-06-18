@@ -1,6 +1,9 @@
 import {
+  archiveSessionInDb,
   getSessionByIdFromDb,
   listActiveSessionsFromDb,
+  restoreSessionInDb,
+  softDeleteSessionInDb,
 } from "../../sessions/repositories/session.repository.js";
 import { sendSuccess } from "../utils/sendResponse.js";
 
@@ -59,5 +62,71 @@ export async function getSessionController(req, res) {
 
   return sendSuccess(res, req, {
     session: serializeSessionDetail(session),
+  });
+}
+
+export async function archiveSessionController(req, res) {
+  const { sessionId } = req.params;
+
+  const existingSession = await getSessionByIdFromDb(sessionId);
+
+  if (!existingSession) {
+    return res.status(404).json({
+      success: false,
+      error: {
+        code: "SESSION_NOT_FOUND",
+        message: "Session not found.",
+      },
+    });
+  }
+
+  const session = await archiveSessionInDb(sessionId);
+
+  return sendSuccess(res, req, {
+    session: serializeSession(session),
+  });
+}
+
+export async function restoreSessionController(req, res) {
+  const { sessionId } = req.params;
+
+  const existingSession = await getSessionByIdFromDb(sessionId);
+
+  if (!existingSession) {
+    return res.status(404).json({
+      success: false,
+      error: {
+        code: "SESSION_NOT_FOUND",
+        message: "Session not found.",
+      },
+    });
+  }
+
+  const session = await restoreSessionInDb(sessionId);
+
+  return sendSuccess(res, req, {
+    session: serializeSession(session),
+  });
+}
+
+export async function softDeleteSessionController(req, res) {
+  const { sessionId } = req.params;
+
+  const existingSession = await getSessionByIdFromDb(sessionId);
+
+  if (!existingSession) {
+    return res.status(404).json({
+      success: false,
+      error: {
+        code: "SESSION_NOT_FOUND",
+        message: "Session not found.",
+      },
+    });
+  }
+
+  const session = await softDeleteSessionInDb(sessionId);
+
+  return sendSuccess(res, req, {
+    session: serializeSession(session),
   });
 }
