@@ -8,6 +8,7 @@ import { requestId } from "./middleware/requestId.js";
 import { requestTimer } from "./middleware/requestTimer.js";
 import { requestLogger } from "./middleware/requestLogger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
+import sessionRoutes from "./v1/routes/session.routes.js";
 import providerRoutes from "./v1/routes/provider.routes.js";
 import optimizeRoutes from "./v1/routes/optimize.routes.js";
 import classifyRoutes from "./v1/routes/classify.routes.js";
@@ -37,6 +38,7 @@ app.use(
 app.use("/v1/optimize", optimizeRoutes);
 app.use("/v1/classify", classifyRoutes);
 app.use("/v1/benchmark", benchmarkRoutes);
+app.use("/v1/sessions", sessionRoutes);
 app.use("/v1/providers", providerRoutes);
 
 app.get("/health", (req, res) => {

@@ -54,8 +54,8 @@ export async function getSessionByIdFromDb(sessionId) {
 export async function listActiveSessionsFromDb({ userId = null } = {}) {
   return prisma.session.findMany({
     where: {
-      userId,
       status: 0,
+      ...(userId ? { userId } : {}),
     },
     orderBy: {
       updatedAt: "desc",
